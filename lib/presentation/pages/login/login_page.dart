@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 
 /// 로그인 페이지
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    throw UnimplementedError();
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(body: Center(child: Text('login')));
   }
 }
