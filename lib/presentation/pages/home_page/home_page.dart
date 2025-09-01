@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_princess/domain/entity/post.dart';
+import 'package:flutter_princess/presentation/common_widget/util/formatters.dart';
 import 'package:flutter_princess/presentation/pages/home_page/home_page_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -60,20 +61,6 @@ class _PostItemState extends State<PostItem> {
   void initState() {
     super.initState();
     _currentLikeCount = widget.post.likeCount;
-  }
-
-  // 작성 시간 포맷팅
-  String _formatTimestamp(DateTime dt) {
-    final now = DateTime.now();
-    final difference = now.difference(dt);
-
-    if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}분 전';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}시간 전';
-    } else {
-      return DateFormat('yyyy-MM-dd').format(dt);
-    }
   }
 
   @override
@@ -162,18 +149,18 @@ class _PostItemState extends State<PostItem> {
                   Text(
                     widget.post.userNickname,
                     style: const TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      shadows: [Shadow(blurRadius: 2, color: Colors.black54)],
+                      shadows: [Shadow(blurRadius: 3, color: Colors.black54)],
                     ),
                   ),
                   Text(
-                    _formatTimestamp(widget.post.createdAt),
+                    formatTimestamp(widget.post.createdAt),
                     style: const TextStyle(
-                      color: Colors.black,
+                      color: Colors.white,
                       fontSize: 12,
-                      shadows: [Shadow(blurRadius: 2, color: Colors.black54)],
+                      shadows: [Shadow(blurRadius: 3, color: Colors.black54)],
                     ),
                   ),
                 ],
@@ -213,7 +200,7 @@ class _PostItemState extends State<PostItem> {
           // 좋아요 버튼
           _buildActionButton(
             icon: _isLiked ? Icons.favorite : Icons.favorite_border,
-            text: _currentLikeCount.toString(),
+            text: formatNumber(_currentLikeCount),
             color: _isLiked ? Colors.red : Colors.white,
             onTap: () {
               setState(() {
@@ -231,7 +218,7 @@ class _PostItemState extends State<PostItem> {
           // 댓글 버튼
           _buildActionButton(
             icon: Icons.comment,
-            text: widget.post.commentCount.toString(),
+            text: formatNumber(widget.post.commentCount),
             color: Colors.white,
             onTap: () => context.go('/comment/${widget.post.id}'),
           ),
@@ -344,30 +331,44 @@ class _PostItemState extends State<PostItem> {
                                     context: builderContext,
                                     backgroundColor: Colors.white,
                                     builder: (bottomSheetContext) {
-                                      return Wrap(
-                                        children: <Widget>[
-                                          ListTile(
-                                            leading: const Icon(Icons.edit),
-                                            title: const Text('게시글 수정'),
-                                            onTap: () {
-                                              Navigator.pop(bottomSheetContext);
-                                              // 수정 페이지로 이동. extra로 현재 게시물 데이터를 전달
-                                              context.push(
-                                                '/write',
-                                                extra: widget.post,
-                                              );
-                                            },
-                                          ),
-                                          ListTile(
-                                            leading: const Icon(Icons.delete),
-                                            title: const Text('게시글 삭제'),
-                                            onTap: () {
-                                              Navigator.pop(bottomSheetContext);
-                                              // TODO: ViewModel에 삭제 요청 로직 추가
-                                              print('삭제 기능 구현 필요');
-                                            },
-                                          ),
-                                        ],
+                                      return Padding(
+                                        padding: EdgeInsets.only(
+                                          top: 8,
+                                          bottom:
+                                              MediaQuery.of(
+                                                context,
+                                              ).padding.bottom +
+                                              8,
+                                        ),
+                                        child: Wrap(
+                                          children: <Widget>[
+                                            ListTile(
+                                              leading: const Icon(Icons.edit),
+                                              title: const Text('게시글 수정'),
+                                              onTap: () {
+                                                Navigator.pop(
+                                                  bottomSheetContext,
+                                                );
+                                                // 수정 페이지로 이동. extra로 현재 게시물 데이터를 전달
+                                                context.push(
+                                                  '/write',
+                                                  extra: widget.post,
+                                                );
+                                              },
+                                            ),
+                                            ListTile(
+                                              leading: const Icon(Icons.delete),
+                                              title: const Text('게시글 삭제'),
+                                              onTap: () {
+                                                Navigator.pop(
+                                                  bottomSheetContext,
+                                                );
+                                                // TODO: ViewModel에 삭제 요청 로직 추가
+                                                print('삭제 기능 구현 필요');
+                                              },
+                                            ),
+                                          ],
+                                        ),
                                       );
                                     },
                                   );

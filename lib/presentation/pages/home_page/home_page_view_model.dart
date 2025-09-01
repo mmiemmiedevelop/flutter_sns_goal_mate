@@ -29,14 +29,12 @@ final List<Post> _mockPosts = [
     userNickname: '정소린',
     userProfileImageUrl: 'https://placehold.co/100x100/F27272/FFFFFF?text=SR',
     imageUrls: [
-      // 'https://unsplash.com/ko/사진/건물-옆-햇볕이-잘-드는-거리에-주차된-자전거-KiL79wI17L4',
-      // 'https://unsplash.com/ko/사진/출입-금지-표지판과-원뿔이-있는-현대적인-건물-TA_HJvMfe8k',
       'https://picsum.photos/900/1600',
       'https://picsum.photos/900/1600',
     ],
     tags: ['#여행', '#일본', '#다카마쓰'],
     content:
-        '다카마쓰에서 우동먹고 오기 성공! 맛있는 것도 많이 먹고 좋은 사람들과 좋은 시간을 보내서 행복했다. 다리는 부러졌지만! 🔥🔥🔥\n\n'
+        '다카마쓰에서 우동먹고 오기 성공! 맛있는 것도 많이 먹고 좋은 사람들과 좋은 시간을 보내서 행복했다. 다리는 부러졌지만! 🔥🔥🔥\n'
         '아주 긴 글 테스트입니다. 이 글은 화면을 넘어가야 합니다. 더보기 기능을 구현해야 하기 때문입니다. 인스타그램과 틱톡을 합친 멋진 앱을 만들어봅시다. 투둠나라 움바공주님들 화이팅하소서!\n'
         '아주 긴 글 테스트입니다. 이 글은 화면을 넘어가야 합니다. 더보기 기능을 구현해야 하기 때문입니다. 인스타그램과 틱톡을 합친 멋진 앱을 만들어봅시다. 투둠나라 움바공주님들 화이팅하소서!\n'
         '아주 긴 글 테스트입니다. 이 글은 화면을 넘어가야 합니다. 더보기 기능을 구현해야 하기 때문입니다. 인스타그램과 틱톡을 합친 멋진 앱을 만들어봅시다. 투둠나라 움바공주님들 화이팅하소서!\n'
@@ -59,5 +57,22 @@ final List<Post> _mockPosts = [
     createdAt: DateTime.now().subtract(const Duration(hours: 5)),
     likeCount: 256,
     commentCount: 32,
+  ),
+  Post(
+    id: '3',
+    userId: 'video_lee',
+    userNickname: '이영상',
+    userProfileImageUrl: 'https://placehold.co/100x100/F27272/FFFFFF?text=YS',
+    imageUrls: [
+      'https://picsum.photos/id/58/1280/853.jpg',
+      'https://picsum.photos/900/1600',
+    ],
+    tags: ['#영상', '#아이디어', '#목표달성', '#공주'],
+    content:
+        '안녕하세요 영상공주입니다. 투둠나라 백성들은 세금을 왜이리 적게 내는걸까? 어떻게 하면 더 걷을 수 있을까? 언제나 열심히 노력하는 대공주입니다.'
+        '소공주님들도 열심히 하고 있지요? 공주수업 열심히 듣고 따라오셔야 저같은 완벽한 대공주가 될 수 있답니다. 뿌뿌',
+    createdAt: DateTime.now().subtract(const Duration(days: 2)),
+    likeCount: 1004,
+    commentCount: 1598,
   ),
 ];
