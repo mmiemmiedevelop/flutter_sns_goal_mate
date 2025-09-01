@@ -89,7 +89,7 @@ class _PostItemState extends State<PostItem> {
         _buildBackgroundImage(),
 
         // 2. 상단 UI (앱 이름, 프로필, 닉네임, 작성 시간, 설정 버튼)
-        _buildTopBar(context),
+        _buildTopBar(context, isMyPost),
 
         // 3. 우측 액션 버튼 (글쓰기, 좋아요, 댓글)
         _buildActionButtons(context),
@@ -116,7 +116,7 @@ class _PostItemState extends State<PostItem> {
   }
 
   // 2. 상단 UI
-  Widget _buildTopBar(BuildContext context) {
+  Widget _buildTopBar(BuildContext context, bool isMyPost) {
     return Positioned(
       top: 50,
       left: 16,
@@ -137,10 +137,11 @@ class _PostItemState extends State<PostItem> {
                 ),
               ),
 
-              IconButton(
-                icon: const Icon(Icons.settings, color: Colors.black),
-                onPressed: () => context.go('/setting'),
-              ),
+              if (isMyPost)
+                IconButton(
+                  icon: const Icon(Icons.settings, color: Colors.black),
+                  onPressed: () => context.go('/setting'),
+                ),
             ],
           ),
           const SizedBox(height: 16),
@@ -295,9 +296,10 @@ class _PostItemState extends State<PostItem> {
           child: ClipRRect(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              // 박스 확장할때 배경색을 더 진하게 변경
               child: Container(
                 padding: const EdgeInsets.all(16),
-                color: Colors.black26,
+                color: _isExpanded ? Colors.black54 : Colors.black38,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -378,16 +380,19 @@ class _PostItemState extends State<PostItem> {
                     const SizedBox(height: 8),
                     // 본문 내용
                     Expanded(
-                      child: Text(
-                        widget.post.content,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
+                      child: SingleChildScrollView(
+                        child: Text(
+                          widget.post.content,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
+                          maxLines: _isExpanded
+                              ? 100
+                              : 3, // 확장 시 최대 100줄, 축소 시 3줄
+                          overflow:
+                              TextOverflow.ellipsis, // 내용이 넘칠 경우 '...'으로 표시
                         ),
-                        maxLines: _isExpanded
-                            ? 100
-                            : 2, // 확장 시 최대 100줄, 축소 시 2줄
-                        overflow: TextOverflow.ellipsis, // 내용이 넘칠 경우 '...'으로 표시
                       ),
                     ),
                   ],
