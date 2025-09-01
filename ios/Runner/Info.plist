@@ -2,10 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+ 
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>프로필 사진 업로드를 위해 사진 접근이 필요합니다.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>프로필 사진 촬영을 위해 카메라 접근이 필요합니다.</string>
+
+<!-- firebase_analytics -->
+	<key>NSUserTrackingUsageDescription</key>
+	<string>앱 사용 분석을 위해 추적 권한이 필요합니다.</string>
+
 
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
