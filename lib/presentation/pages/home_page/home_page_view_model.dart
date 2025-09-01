@@ -67,7 +67,7 @@ final List<Post> _mockPosts = [
     id: '1',
     userId: 'sorin_dev', // 나중에 실제 내 아이디와 비교해서 수정/삭제 버튼 표시
     userNickname: '정소린',
-    userProfileImageUrl: 'https://placehold.co/100x100/F27272/FFFFFF?text=SR',
+    userProfileImageUrl: 'https://picsum.photos/200/300',
     imageUrls: [
       'https://picsum.photos/900/1600',
       'https://picsum.photos/900/1600',
@@ -88,7 +88,8 @@ final List<Post> _mockPosts = [
     id: '2',
     userId: 'youngmin_kim',
     userNickname: '김영민',
-    userProfileImageUrl: 'https://placehold.co/100x100/F27272/FFFFFF?text=YM',
+    userProfileImageUrl: 'https://picsum.photos/200/300',
+
     imageUrls: [
       'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop',
     ],
@@ -104,7 +105,8 @@ final List<Post> _mockPosts = [
     id: '3',
     userId: 'video_lee',
     userNickname: '이영상',
-    userProfileImageUrl: 'https://placehold.co/100x100/F27272/FFFFFF?text=YS',
+    userProfileImageUrl: 'https://picsum.photos/200/300',
+
     imageUrls: [
       'https://picsum.photos/id/58/1280/853.jpg',
       'https://picsum.photos/900/1600',

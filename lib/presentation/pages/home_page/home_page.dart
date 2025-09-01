@@ -230,7 +230,9 @@ class _PostItemState extends ConsumerState<PostItem> {
             icon: Icons.comment,
             text: formatNumber(widget.post.commentCount),
             color: Colors.white,
-            onTap: () => context.go('/comment/${widget.post.id}'),
+            onTap: () {
+              context.go('/comment', extra: widget.post);
+            },
           ),
         ],
       ),
