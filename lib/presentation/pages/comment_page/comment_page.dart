@@ -77,82 +77,87 @@ class _CommentPageState extends ConsumerState<CommentPage> {
       appBar: AppBar(title: Text("댓글 ${comments.length}"), centerTitle: true),
       body:
           // 파이어베이스 완료 후 RefreshIndicator 추가
-          GestureDetector(
-            onTap: () {
-              FocusScope.of(context).unfocus();
+          RefreshIndicator(
+            onRefresh: () async {
+              await vm.fetchComments(widget.postId);
             },
-            child: Column(
-              children: [
-                Expanded(
-                  child: ListView.separated(
-                    itemCount: comments.length,
-                    itemBuilder: (context, index) {
-                      final comment = comments[index];
+            child: GestureDetector(
+              onTap: () {
+                FocusScope.of(context).unfocus();
+              },
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.separated(
+                      itemCount: comments.length,
+                      itemBuilder: (context, index) {
+                        final comment = comments[index];
 
-                      // id 비교
-                      final isMine = comment.userId == widget.userId;
+                        // id 비교
+                        final isMine = comment.userId == widget.userId;
 
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: NetworkImage(
-                            comment.userProfileImageUrl,
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: NetworkImage(
+                              comment.userProfileImageUrl,
+                            ),
                           ),
-                        ),
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              comment.userNickname,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              formatTime(comment.createdAt),
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.grey,
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                comment.userNickname,
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                            ),
+                              Text(
+                                formatTime(comment.createdAt),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          // 내용
+                          subtitle: Padding(
+                            padding: EdgeInsets.only(top: 4),
+                            child: Text(comment.content),
+                          ),
+
+                          // 더보기(수정, 삭제)
+                          trailing: isMine
+                              ? IconButton(
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return vertButton(context, comment);
+                                      },
+                                    );
+                                  },
+                                  icon: Icon(Icons.more_vert),
+                                )
+                              : null,
+                        );
+                      },
+
+                      // Divider
+                      separatorBuilder: (context, index) {
+                        return Column(
+                          children: [
+                            SizedBox(height: 5),
+                            Divider(height: 1),
+                            SizedBox(height: 5),
                           ],
-                        ),
-
-                        // 내용
-                        subtitle: Padding(
-                          padding: EdgeInsets.only(top: 4),
-                          child: Text(comment.content),
-                        ),
-
-                        // 더보기(수정, 삭제)
-                        trailing: isMine
-                            ? IconButton(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return vertButton(context, comment);
-                                    },
-                                  );
-                                },
-                                icon: Icon(Icons.more_vert),
-                              )
-                            : null,
-                      );
-                    },
-
-                    // Divider
-                    separatorBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          SizedBox(height: 5),
-                          Divider(height: 1),
-                          SizedBox(height: 5),
-                        ],
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
-                Divider(height: 1),
-                _commentInput(),
-              ],
+                  Divider(height: 1),
+                  _commentInput(),
+                ],
+              ),
             ),
           ),
     );
