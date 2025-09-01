@@ -27,11 +27,12 @@ final List<Post> _mockPosts = [
     id: '1',
     userId: 'sorin_dev', // 나중에 실제 내 아이디와 비교해서 수정/삭제 버튼 표시
     userNickname: '정소린',
-    userProfileImageUrl: 'https://picsum.photos/100',
+    userProfileImageUrl: 'https://placehold.co/100x100/F27272/FFFFFF?text=SR',
     imageUrls: [
-      'https://unsplash.com/ko/사진/건물-옆-햇볕이-잘-드는-거리에-주차된-자전거-KiL79wI17L4',
-      'https://unsplash.com/ko/사진/출입-금지-표지판과-원뿔이-있는-현대적인-건물-TA_HJvMfe8k',
-      'https://picsum.photos/90/160',
+      // 'https://unsplash.com/ko/사진/건물-옆-햇볕이-잘-드는-거리에-주차된-자전거-KiL79wI17L4',
+      // 'https://unsplash.com/ko/사진/출입-금지-표지판과-원뿔이-있는-현대적인-건물-TA_HJvMfe8k',
+      'https://picsum.photos/900/1600',
+      'https://picsum.photos/900/1600',
     ],
     tags: ['#여행', '#일본', '#다카마쓰'],
     content:

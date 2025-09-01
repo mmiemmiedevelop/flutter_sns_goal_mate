@@ -122,15 +122,14 @@ class _PostItemState extends State<PostItem> {
                 'GoalMate',
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  shadows: [const Shadow(blurRadius: 2, color: Colors.black54)],
                 ),
               ),
 
               IconButton(
-                icon: const Icon(Icons.settings, color: Colors.white),
+                icon: const Icon(Icons.settings, color: Colors.black),
                 onPressed: () => context.go('/setting'),
               ),
             ],
@@ -153,14 +152,14 @@ class _PostItemState extends State<PostItem> {
                   Text(
                     widget.post.userNickname,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                   ),
                   Text(
                     _formatTimestamp(widget.post.createdAt),
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                    style: const TextStyle(color: Colors.black, fontSize: 12),
                   ),
                 ],
               ),
@@ -179,16 +178,20 @@ class _PostItemState extends State<PostItem> {
       child: Column(
         children: [
           // 글 작성 버튼 (과제 요구사항은 하단 가운데였으나, 틱톡 스타일에서는 우측에 위치)
-          // 팀과 상의 후 위치 변경 가능
-          Container(
-            decoration: BoxDecoration(
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: Material(
               color: Colors.deepPurple,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5)],
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.add, color: Colors.white, size: 30),
-              onPressed: () => context.go('/write'),
+              child: InkWell(
+                onTap: () => context.go('/write'),
+                child: Container(
+                  padding: const EdgeInsets.all(4.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: const Icon(Icons.add, color: Colors.white, size: 25),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 20),
