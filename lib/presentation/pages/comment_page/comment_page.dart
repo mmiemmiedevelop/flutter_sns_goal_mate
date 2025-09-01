@@ -51,10 +51,9 @@ class _CommentPageState extends ConsumerState<CommentPage> {
 
   // 댓글 전송 로직
   void _sentComment() {
-    final state = ref.read(commentProvider(widget.postId));
     final vm = ref.read(commentProvider(widget.postId).notifier);
 
-    if (state.inputText.trim().isEmpty) return;
+    if (_commentController.text.trim().isEmpty) return;
 
     vm.sentComment(
       widget.userId,
@@ -69,92 +68,108 @@ class _CommentPageState extends ConsumerState<CommentPage> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.read(commentProvider(widget.postId));
+    final state = ref.watch(commentProvider(widget.postId));
     final vm = ref.read(commentProvider(widget.postId).notifier);
-    final comments = state.comments;
-
-    return Scaffold(
-      appBar: AppBar(title: Text("댓글 ${comments.length}"), centerTitle: true),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await vm.fetchComments(widget.postId);
-        },
-        child: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).unfocus();
+    return state.when(
+      data: (data) => Scaffold(
+        appBar: AppBar(
+          title: Text("댓글 ${data.comments.length}"),
+          centerTitle: true,
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            await vm.fetchComments(widget.postId);
           },
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView.separated(
-                  itemCount: comments.length,
-                  itemBuilder: (context, index) {
-                    final comment = comments[index];
+          child: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: data.comments.length,
+                    itemBuilder: (context, index) {
+                      final comment = data.comments[index];
 
-                    // id 비교
-                    final isMine = comment.userId == widget.userId;
+                      // id 비교
+                      final isMine = comment.userId == widget.userId;
 
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          comment.userProfileImageUrl,
+                      return ListTile(
+                        onLongPress: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return vertButton(context, comment);
+                            },
+                          );
+                        },
+                        leading: CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            comment.userProfileImageUrl,
+                          ),
                         ),
-                      ),
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              comment.userNickname,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              formatTime(comment.createdAt),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // 내용
+                        subtitle: Padding(
+                          padding: EdgeInsets.only(top: 4),
+                          child: Text(comment.content),
+                        ),
+
+                        // 더보기(수정, 삭제)
+                        trailing: isMine
+                            ? IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return vertButton(context, comment);
+                                    },
+                                  );
+                                },
+                                icon: Icon(Icons.more_vert),
+                              )
+                            : null,
+                      );
+                    },
+
+                    // Divider
+                    separatorBuilder: (context, index) {
+                      return Column(
                         children: [
-                          Text(
-                            comment.userNickname,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            formatTime(comment.createdAt),
-                            style: TextStyle(fontSize: 11, color: Colors.grey),
-                          ),
+                          SizedBox(height: 5),
+                          Divider(height: 1),
+                          SizedBox(height: 5),
                         ],
-                      ),
-
-                      // 내용
-                      subtitle: Padding(
-                        padding: EdgeInsets.only(top: 4),
-                        child: Text(comment.content),
-                      ),
-
-                      // 더보기(수정, 삭제)
-                      trailing: isMine
-                          ? IconButton(
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return vertButton(context, comment);
-                                  },
-                                );
-                              },
-                              icon: Icon(Icons.more_vert),
-                            )
-                          : null,
-                    );
-                  },
-
-                  // Divider
-                  separatorBuilder: (context, index) {
-                    return Column(
-                      children: [
-                        SizedBox(height: 5),
-                        Divider(height: 1),
-                        SizedBox(height: 5),
-                      ],
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
-              ),
-              Divider(height: 1),
-              _commentInput(),
-            ],
+                Divider(height: 1),
+                _commentInput(),
+              ],
+            ),
           ),
         ),
       ),
+      loading: () => Center(child: CircularProgressIndicator()),
+      error: (err, _) => Center(child: Text("에러 발생 : $err")),
     );
   }
 
@@ -228,7 +243,7 @@ class _CommentPageState extends ConsumerState<CommentPage> {
   Widget _commentInput() {
     final state = ref.watch(commentProvider(widget.postId));
     final vm = ref.read(commentProvider(widget.postId).notifier);
-    final isActive = state.inputText.trim().isNotEmpty;
+    final isActive = _commentController.text.trim().isNotEmpty;
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -264,7 +279,7 @@ class _CommentPageState extends ConsumerState<CommentPage> {
 
             // 남은 글자 수
             Text(
-              "${state.inputText.length}/500",
+              "${_commentController.text.length}/500",
               style: TextStyle(fontSize: 10, fontWeight: FontWeight.w300),
             ),
 
