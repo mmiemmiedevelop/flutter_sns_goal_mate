@@ -81,7 +81,7 @@ class _PostItemState extends ConsumerState<PostItem> {
         _buildTopBar(context, isMyPost),
 
         // 3. 우측 액션 버튼 (글쓰기, 좋아요, 댓글)
-        _buildActionButtons(context, isLiked),
+        _buildActionButtons(context, isLiked, currentUserId),
 
         // 4. 하단 정보 UI (태그, 내용, 수정/삭제 버튼)
         _buildBottomContent(context, isMyPost),
@@ -175,7 +175,11 @@ class _PostItemState extends ConsumerState<PostItem> {
   }
 
   // 3. 우측 액션 버튼
-  Widget _buildActionButtons(BuildContext context, bool isLiked) {
+  Widget _buildActionButtons(
+    BuildContext context,
+    bool isLiked,
+    String currentUserId,
+  ) {
     return Positioned(
       bottom: 240,
       right: 16,
@@ -215,10 +219,9 @@ class _PostItemState extends ConsumerState<PostItem> {
               //     currentLikeCount--;
               //   }
               // });
-              // TODO: ViewModel에 좋아요 상태 업데이트 요청 로직 추가
               ref
                   .read(homePageViewModelProvider.notifier)
-                  .toggleLikeStatus(widget.post.id);
+                  .toggleLikeStatus(widget.post.id, currentUserId);
             },
           ),
           const SizedBox(height: 20),

@@ -3,49 +3,61 @@
 import 'package:flutter_princess/domain/entity/post.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// ViewModel을 제공하는 Provider (UI에서는 이 provider를 통해 ViewModel에 접근)
 final homePageViewModelProvider =
     StateNotifierProvider<HomePageViewModel, List<Post>>((ref) {
-      // TODO: 나중에 Repository를 주입받기!
+      // TODO: 실제 Repository 주입
       // final repository = ref.watch(postRepositoryProvider);
       // return HomePageViewModel(repository);
       return HomePageViewModel();
     });
 
 class HomePageViewModel extends StateNotifier<List<Post>> {
-  // TODO: Firestore와 통신할 Repository를 넣기
-  // final PostRepository _repository;
-
-  // TODO: 나중에 Repository를 인자로 받도록 수정: HomePageViewModel(this._repository) : super([])
   HomePageViewModel() : super([]) {
-    // ViewModel이 처음 생성될 때, 첫 페이지의 게시물 데이터를 불러옵니다.
     fetchNextPage();
   }
 
   // 다음 페이지의 게시물을 불러오는 함수 (무한 스크롤)
   Future<void> fetchNextPage() async {
     // TODO: 여기에 Firestore에서 데이터를 페이지 단위로 불러오는 로직을 구현할 예정
-    // final newPosts = await _repository.fetchPosts(lastPostId: state.last.id);
-    // state = [...state, ...newPosts]; // 기존 리스트에 새로운 포스트 추가
 
     // --- 현재는 UI 테스트를 위해 가짜(mock) 데이터를 추가하는 로ogic ---
     await Future.delayed(const Duration(seconds: 1)); // 네트워크 통신처럼 보이게 1초 지연
-    final morePosts = _mockPosts
-        .map((p) => p.copyWith(id: '${p.id}_${state.length}'))
-        .toList();
+    final morePosts = _mockPosts.map((p) {
+      // 고유 ID를 만들기 위해 현재 state 길이를 이용
+      final uniqueId = '${p.id}_${state.length}';
+      return p.copyWith(id: uniqueId);
+    }).toList();
     state = [...state, ...morePosts];
   }
 
   /// UI로부터 '좋아요' 상태 변경 요청을 처리하는 함수
-  Future<void> toggleLikeStatus(String postId) async {
-    // TODO: Firestore 연동 로직으로 완성해야 함
-    // 1. Repository에 postId를 전달하여 '좋아요' 상태를 업데이트하도록 요청하기
-    //    final success = await _repository.toggleLike(postId: postId, userId: currentUserId);
+  Future<void> toggleLikeStatus(String postId, String currentUserId) async {
+    // TODO: Repository를 호출하여 Firestore 데이터를 실제로 업데이트하는 로직 추가
+    // 1. postId의 좋아요 상태를 DB에 업데이트하라는 요청보내기
+    // final success = await _repository.toggleLike(postId: postId, userId: currentUserId);
+    // if (!success) { /* 만약 서버 업데이트가 실패하면, 원래 상태로 되돌리는 로직 추가 */ }
 
     // 2. 만약 서버 업데이트가 성공했다면, UI에 즉시 반영하기 위해 로컬 상태(state)도 직접 수정합니다.
     //    - Riverpod은 상태가 '불변(immutable)'이어야 하므로, 기존 리스트를 순회하며 새로운 리스트 만들기
     //    - postId가 일치하는 게시물을 찾으면, 그 게시물의 likedBy 리스트를 수정하여 새로운 Post 객체 생성하기
     //    - 일치하지 않는 게시물은 그대로 두기
+
+    state = [
+      for (final post in state)
+        if (post.id == postId)
+          post.toggleLike(currentUserId) // Post 객체 자체에 로직을 위임
+        else
+          post,
+    ];
+  }
+
+  // 게ㅅ,ㅣ글 삭제 함수
+  Future<void> deletePost(String postId) async {
+    // state 리스트에서 postId가 일치하지 않는 게시물만 남겨서 새로운 리스트 만들기
+    state = state.where((post) => post.id != postId).toList();
+
+    // TODO: 여기에 Repository를 호출하여 Firestore 데이터를 실제로 삭제하는 로직 추가
+    // await _repository.deletePost(postId: postId);
   }
 }
 

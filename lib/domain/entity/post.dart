@@ -42,4 +42,48 @@ class Post {
       likedBy: List<String>.from(data['likedBy'] ?? []),
     );
   }
+
+  Post copyWith({
+    String? id,
+    String? userId,
+    String? userNickname,
+    String? userProfileImageUrl,
+    List<String>? imageUrls,
+    List<String>? tags,
+    String? content,
+    DateTime? createdAt,
+    int? likeCount,
+    int? commentCount,
+    List<String>? likedBy,
+  }) {
+    return Post(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      userNickname: userNickname ?? this.userNickname,
+      userProfileImageUrl: userProfileImageUrl ?? this.userProfileImageUrl,
+      imageUrls: imageUrls ?? this.imageUrls,
+      tags: tags ?? this.tags,
+      content: content ?? this.content,
+      createdAt: createdAt ?? this.createdAt,
+      likeCount: likeCount ?? this.likeCount,
+      commentCount: commentCount ?? this.commentCount,
+      likedBy: likedBy ?? this.likedBy,
+    );
+  }
+
+  Post toggleLike(String userId) {
+    final isLiked = likedBy.contains(userId);
+    final newLikedBy = List<String>.from(likedBy);
+    int newLikeCount = likeCount;
+
+    if (isLiked) {
+      newLikedBy.remove(userId); // 좋아요 취소
+      newLikeCount--;
+    } else {
+      newLikedBy.add(userId); // 좋아요
+      newLikeCount++;
+    }
+
+    return copyWith(likedBy: newLikedBy, likeCount: newLikeCount);
+  }
 }
