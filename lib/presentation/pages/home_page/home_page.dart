@@ -7,7 +7,6 @@ import 'package:flutter_princess/domain/entity/post.dart';
 import 'package:flutter_princess/presentation/pages/home_page/home_page_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class HomePage extends ConsumerWidget {
@@ -121,13 +120,15 @@ class _PostItemState extends State<PostItem> {
             children: [
               Text(
                 'GoalMate',
-                style: GoogleFonts.poppins(
+                style: TextStyle(
+                  fontFamily: 'NotoSansKR',
                   color: Colors.white,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   shadows: [const Shadow(blurRadius: 2, color: Colors.black54)],
                 ),
               ),
+
               IconButton(
                 icon: const Icon(Icons.settings, color: Colors.white),
                 onPressed: () => context.go('/setting'),
