@@ -53,6 +53,15 @@ class _PostItemState extends State<PostItem> {
   // 좋아요 상태
   bool _isLiked = false;
 
+  // 좋아요 숫자 변경을 위한 상태 변수
+  late int _currentLikeCount;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentLikeCount = widget.post.likeCount;
+  }
+
   // 작성 시간 포맷팅
   String _formatTimestamp(DateTime dt) {
     final now = DateTime.now();
@@ -155,11 +164,16 @@ class _PostItemState extends State<PostItem> {
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
+                      shadows: [Shadow(blurRadius: 2, color: Colors.black54)],
                     ),
                   ),
                   Text(
                     _formatTimestamp(widget.post.createdAt),
-                    style: const TextStyle(color: Colors.black, fontSize: 12),
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 12,
+                      shadows: [Shadow(blurRadius: 2, color: Colors.black54)],
+                    ),
                   ),
                 ],
               ),
@@ -198,11 +212,16 @@ class _PostItemState extends State<PostItem> {
           // 좋아요 버튼
           _buildActionButton(
             icon: _isLiked ? Icons.favorite : Icons.favorite_border,
-            text: widget.post.likeCount.toString(),
+            text: _currentLikeCount.toString(),
             color: _isLiked ? Colors.red : Colors.white,
             onTap: () {
               setState(() {
                 _isLiked = !_isLiked;
+                if (_isLiked) {
+                  _currentLikeCount++;
+                } else {
+                  _currentLikeCount--;
+                }
                 // TODO: ViewModel에 좋아요 상태 업데이트 요청 로직 추가
               });
             },
