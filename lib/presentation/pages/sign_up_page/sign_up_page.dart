@@ -82,18 +82,26 @@ class _SignUpPageState extends State<SignUpPage> {
     return Scaffold(
       body: SafeArea(
         child: Container(
-          padding: EdgeInsets.only(top: width * 0.3),
+          padding: EdgeInsets.only(top: width * 0.2),
           width: double.infinity,
           child: ListView(
             padding: EdgeInsets.symmetric(horizontal: 26),
 
             children: [
+              Container(
+                child: Text(
+                  '나를 표현할 수 있는 \n프로필과 닉네임을 \n넣어주세요',
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 15),
+
               //프로필 이미지
               Center(
                 child: Stack(
                   children: [
                     CircleAvatar(
-                      radius: 60,
+                      radius: 100,
                       backgroundColor: _imageFile == null
                           ? const Color.fromARGB(255, 190, 190, 190)
                           : null,
