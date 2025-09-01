@@ -16,4 +16,25 @@ class Comment {
     required this.content,
     required this.createdAt,
   });
+
+  // 댓글 수정용
+  Comment copyWith({
+    String? id,
+    String? userId,
+    String? postId,
+    String? userNickname,
+    String? userProfileImageUrl,
+    String? content,
+    DateTime? createdAt,
+  }) {
+    return Comment(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      postId: postId ?? this.postId,
+      userNickname: userNickname ?? this.userNickname,
+      userProfileImageUrl: userProfileImageUrl ?? this.userProfileImageUrl,
+      content: content ?? this.content,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }

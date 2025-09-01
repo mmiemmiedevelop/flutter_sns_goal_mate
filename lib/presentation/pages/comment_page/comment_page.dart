@@ -1,48 +1,67 @@
 // 댓글 페이지
 import 'package:flutter/material.dart';
+import 'package:flutter_princess/domain/entity/comment.dart';
+import 'package:flutter_princess/presentation/pages/comment_page/comment_page_view_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-class CommentPage extends StatefulWidget {
-  // final Stirng postID;
-  const CommentPage({super.key});
+class CommentPage extends ConsumerStatefulWidget {
+  final String postId;
+  // 접속중인 유저 정보 필요
+  // ex) User user or String userID, userNickName etc.
+  final String userId;
+  final String userNickname;
+  final String userProfileImageUrl;
+
+  const CommentPage({
+    super.key,
+    required this.postId,
+    required this.userId,
+    required this.userNickname,
+    required this.userProfileImageUrl,
+  });
 
   @override
-  State<CommentPage> createState() => _CommentPageState();
+  ConsumerState<CommentPage> createState() => _CommentPageState();
 }
 
-class _CommentPageState extends State<CommentPage> {
+class _CommentPageState extends ConsumerState<CommentPage> {
   // 댓글 텍스트 컨트롤러
   final TextEditingController _commentController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  String _inputText = "";
+
+  late CommentPageViewModel viewModel;
 
   @override
   void initState() {
     super.initState();
     _commentController.addListener(() {
-      setState(() {
-        _inputText = _commentController.text;
-      });
+      ref
+          .read(commentProvider(widget.postId).notifier)
+          .sentInputText(_commentController.text);
     });
   }
 
   @override
   void dispose() {
-    super.dispose();
     _commentController.dispose();
     _focusNode.dispose();
+    super.dispose();
   }
 
   // 댓글 전송 로직
   void _sentComment() {
-    if (_inputText.trim().isEmpty) return;
+    final state = ref.read(commentProvider(widget.postId));
+    final vm = ref.read(commentProvider(widget.postId).notifier);
 
-    setState(() {
-      // 전송 시 화면 즉시 반영 혹은 새로고침
-      // comments.insert(0, newComment);
-    });
+    if (state.inputText.trim().isEmpty) return;
 
-    // TODO: 파이어베이스 저장
+    vm.sentComment(
+      widget.userId,
+      widget.postId,
+      widget.userNickname,
+      widget.userProfileImageUrl,
+    );
 
     _commentController.clear();
     _focusNode.unfocus();
@@ -50,8 +69,12 @@ class _CommentPageState extends State<CommentPage> {
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.read(commentProvider(widget.postId));
+    final vm = ref.read(commentProvider(widget.postId).notifier);
+    final comments = state.comments;
+
     return Scaffold(
-      appBar: AppBar(title: Text("댓글 4"), centerTitle: true),
+      appBar: AppBar(title: Text("댓글 ${comments.length}"), centerTitle: true),
       body:
           // 파이어베이스 완료 후 RefreshIndicator 추가
           GestureDetector(
@@ -62,22 +85,28 @@ class _CommentPageState extends State<CommentPage> {
               children: [
                 Expanded(
                   child: ListView.separated(
-                    itemCount: 4,
+                    itemCount: comments.length,
                     itemBuilder: (context, index) {
+                      final comment = comments[index];
+
+                      // id 비교
+                      final isMine = comment.userId == widget.userId;
+
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: Colors.amber,
-                          // backgroundImage: NetworkImage(comment["imageUri"]),
+                          backgroundImage: NetworkImage(
+                            comment.userProfileImageUrl,
+                          ),
                         ),
                         title: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "name",
+                              comment.userNickname,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "formatTime(commentTime)",
+                              formatTime(comment.createdAt),
                               style: TextStyle(
                                 fontSize: 11,
                                 color: Colors.grey,
@@ -89,22 +118,23 @@ class _CommentPageState extends State<CommentPage> {
                         // 내용
                         subtitle: Padding(
                           padding: EdgeInsets.only(top: 4),
-                          child: Text("comment[\"content\"]!"),
+                          child: Text(comment.content),
                         ),
 
                         // 더보기(수정, 삭제)
-                        trailing: IconButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return vertButton(context);
-                                // return vertButton(context, comment[index]);
-                              },
-                            );
-                          },
-                          icon: Icon(Icons.more_vert),
-                        ),
+                        trailing: isMine
+                            ? IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return vertButton(context, comment);
+                                    },
+                                  );
+                                },
+                                icon: Icon(Icons.more_vert),
+                              )
+                            : null,
                       );
                     },
 
@@ -129,8 +159,7 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   // 더보기 팝업창
-  Widget vertButton(BuildContext context) {
-    // Widget vertButton(BuildContext context, Map<String, dynamic> comment) {
+  Widget vertButton(BuildContext context, Comment comment) {
     return AlertDialog(
       title: const Text("팝업(게시물 팝업이랑 공통 디자인)"),
       content: const Text("댓글을 수정하거나 삭제하시겠습니까?"),
@@ -138,14 +167,14 @@ class _CommentPageState extends State<CommentPage> {
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
-            // _editComment(comment["id"], comment["content"]);
+            _editComment(comment);
           },
           child: const Text("수정"),
         ),
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
-            // _deleteComment(comment["id"]);
+            _deleteComment(comment);
           },
           child: const Text("삭제"),
         ),
@@ -154,9 +183,9 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   // 댓글 수정
-  void _editComment(String id, String currentContent) {
+  void _editComment(Comment comment) {
     final TextEditingController editController = TextEditingController(
-      text: currentContent,
+      text: comment.content,
     );
     showDialog(
       context: context,
@@ -171,24 +200,14 @@ class _CommentPageState extends State<CommentPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // 취소
+                Navigator.of(context).pop();
               },
               child: Text("취소"),
             ),
             TextButton(
               onPressed: () {
-                setState(() {
-                  // final index = comments.indexWhere(
-                  //   (comment) => comment["id"] == id,
-                  // );
-                  // if (index != -1) {
-                  //   comments[index]["content"] = editController.text;
-                  // }
-                });
-
-                // TODO: Firebase에도 반영
-                // FirebaseFirestore.instance.collection("comments").doc(id).update({"content": editController.text});
-
+                final vm = ref.read(commentProvider(widget.postId).notifier);
+                vm.editComment(comment.id, editController.text);
                 Navigator.of(context).pop();
               },
               child: Text("수정"),
@@ -200,16 +219,17 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   // 댓글 삭제
-  void _deleteComment(String id) {
-    setState(() {
-      // TODO: FIrebase에서도 삭제
-      // comments.removeWhere((comment) => comment["id"] == id);
-    });
+  void _deleteComment(Comment comment) {
+    final vm = ref.read(commentProvider(widget.postId).notifier);
+    vm.deleteComment(comment.id);
   }
 
   // 댓글 입력
   Widget _commentInput() {
-    final isActive = _inputText.trim().isNotEmpty;
+    final state = ref.watch(commentProvider(widget.postId));
+    final vm = ref.read(commentProvider(widget.postId).notifier);
+    final isActive = state.inputText.trim().isNotEmpty;
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       color: Colors.white,
@@ -220,8 +240,7 @@ class _CommentPageState extends State<CommentPage> {
             SizedBox(width: 4),
             CircleAvatar(
               radius: 16,
-              backgroundColor: Colors.amber,
-              // backgroundImage: NetworkImage(""),
+              backgroundImage: NetworkImage(widget.userProfileImageUrl),
             ),
             SizedBox(width: 8),
 
@@ -233,9 +252,7 @@ class _CommentPageState extends State<CommentPage> {
                 maxLength: 500,
                 maxLines: isActive ? 2 : 1,
                 onChanged: (value) {
-                  setState(() {
-                    _inputText = value;
-                  });
+                  vm.sentInputText(value);
                 },
                 decoration: InputDecoration(
                   hintText: "댓글을 입력하세요",
@@ -247,14 +264,16 @@ class _CommentPageState extends State<CommentPage> {
 
             // 남은 글자 수
             Text(
-              "${_inputText.length}/500",
+              "${state.inputText.length}/500",
               style: TextStyle(fontSize: 10, fontWeight: FontWeight.w300),
             ),
 
             // 전송 버튼
             IconButton(
               onPressed: () {
-                isActive ? _sentComment : null;
+                if (isActive) {
+                  isActive ? _sentComment() : null;
+                }
               },
               icon: Icon(
                 Icons.send,

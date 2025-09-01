@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class CommentDto {
   final String id;
   final String userId;
@@ -25,10 +27,7 @@ class CommentDto {
       userNickname: json["userNickname"] as String,
       userProfileImageUrl: json["userProfileImageUrl"] as String,
       content: json["content"] as String,
-      // TODO : DateTime > TimeStamp 로 변환
-      createdAt: json["createdAt"] is DateTime
-          ? (json["createdAt"] as DateTime)
-          : DateTime.parse(json["createdAt"]),
+      createdAt: (json["createdAt"] as Timestamp).toDate(),
     );
   }
 
@@ -40,8 +39,7 @@ class CommentDto {
       "userNickname": userNickname,
       "userProfileImageUrl": userProfileImageUrl,
       "content": content,
-      // TODO : DateTime > TimeStamp 로 변환
-      "createdAt": createdAt.toIso8601String(),
+      "createdAt": Timestamp.fromDate(createdAt),
     };
   }
 }
