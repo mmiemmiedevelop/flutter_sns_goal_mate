@@ -231,7 +231,7 @@ class _PostItemState extends ConsumerState<PostItem> {
             text: formatNumber(widget.post.commentCount),
             color: Colors.white,
             onTap: () {
-              context.go('/comment', extra: widget.post);
+              context.push('/comment/${widget.post.id}', extra: widget.post);
             },
           ),
         ],

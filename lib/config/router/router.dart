@@ -33,7 +33,7 @@ final router = GoRouter(
       builder: (context, state) => SettingPage(),
     ),
     GoRoute(
-      path: '/comment',
+      path: '/comment/:postId',
       name: 'comment',
       builder: (context, state) {
         final post = state.extra as Post?;
