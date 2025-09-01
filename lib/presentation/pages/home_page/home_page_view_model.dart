@@ -6,18 +6,46 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // ViewModel을 제공하는 Provider (UI에서는 이 provider를 통해 ViewModel에 접근)
 final homePageViewModelProvider =
     StateNotifierProvider<HomePageViewModel, List<Post>>((ref) {
+      // TODO: 나중에 Repository를 주입받기!
+      // final repository = ref.watch(postRepositoryProvider);
+      // return HomePageViewModel(repository);
       return HomePageViewModel();
     });
 
 class HomePageViewModel extends StateNotifier<List<Post>> {
-  // 일단 초기 상태로 가라 데이터 리스트를 가짐
-  HomePageViewModel() : super(_mockPosts);
+  // TODO: Firestore와 통신할 Repository를 넣기
+  // final PostRepository _repository;
 
-  // TODO: 이 부분은 나중에 Firestore에서 실제 데이터를 가져오는 로직으로 대체될 예정
-  // (무한 스크롤 구현)
-  void fetchNextPage() {
-    // 현재 리스트에 가짜 데이터를 더 추가해서 무한 스크롤처럼 보이게 함
-    state = [...state, ..._mockPosts];
+  // TODO: 나중에 Repository를 인자로 받도록 수정: HomePageViewModel(this._repository) : super([])
+  HomePageViewModel() : super([]) {
+    // ViewModel이 처음 생성될 때, 첫 페이지의 게시물 데이터를 불러옵니다.
+    fetchNextPage();
+  }
+
+  // 다음 페이지의 게시물을 불러오는 함수 (무한 스크롤)
+  Future<void> fetchNextPage() async {
+    // TODO: 여기에 Firestore에서 데이터를 페이지 단위로 불러오는 로직을 구현할 예정
+    // final newPosts = await _repository.fetchPosts(lastPostId: state.last.id);
+    // state = [...state, ...newPosts]; // 기존 리스트에 새로운 포스트 추가
+
+    // --- 현재는 UI 테스트를 위해 가짜(mock) 데이터를 추가하는 로ogic ---
+    await Future.delayed(const Duration(seconds: 1)); // 네트워크 통신처럼 보이게 1초 지연
+    final morePosts = _mockPosts
+        .map((p) => p.copyWith(id: '${p.id}_${state.length}'))
+        .toList();
+    state = [...state, ...morePosts];
+  }
+
+  /// UI로부터 '좋아요' 상태 변경 요청을 처리하는 함수
+  Future<void> toggleLikeStatus(String postId) async {
+    // TODO: Firestore 연동 로직으로 완성해야 함
+    // 1. Repository에 postId를 전달하여 '좋아요' 상태를 업데이트하도록 요청하기
+    //    final success = await _repository.toggleLike(postId: postId, userId: currentUserId);
+
+    // 2. 만약 서버 업데이트가 성공했다면, UI에 즉시 반영하기 위해 로컬 상태(state)도 직접 수정합니다.
+    //    - Riverpod은 상태가 '불변(immutable)'이어야 하므로, 기존 리스트를 순회하며 새로운 리스트 만들기
+    //    - postId가 일치하는 게시물을 찾으면, 그 게시물의 likedBy 리스트를 수정하여 새로운 Post 객체 생성하기
+    //    - 일치하지 않는 게시물은 그대로 두기
   }
 }
 
@@ -42,6 +70,7 @@ final List<Post> _mockPosts = [
     createdAt: DateTime.now().subtract(const Duration(minutes: 30)),
     likeCount: 102,
     commentCount: 15,
+    likedBy: ['youngmin_kim'],
   ),
   Post(
     id: '2',
@@ -57,6 +86,7 @@ final List<Post> _mockPosts = [
     createdAt: DateTime.now().subtract(const Duration(hours: 5)),
     likeCount: 256,
     commentCount: 32,
+    likedBy: ['video_lee', 'sorin_dev'],
   ),
   Post(
     id: '3',
@@ -74,5 +104,25 @@ final List<Post> _mockPosts = [
     createdAt: DateTime.now().subtract(const Duration(days: 2)),
     likeCount: 1004,
     commentCount: 1598,
+    likedBy: ['sorin_dev'],
   ),
 ];
+
+// Post 객체의 일부 필드만 쉽게 변경할 수 있도록 copyWith 메소드를 추가
+extension PostCopyWith on Post {
+  Post copyWith({String? id}) {
+    return Post(
+      id: id ?? this.id,
+      userId: userId,
+      userNickname: userNickname,
+      userProfileImageUrl: userProfileImageUrl,
+      imageUrls: imageUrls,
+      content: content,
+      tags: tags,
+      likeCount: likeCount,
+      commentCount: commentCount,
+      createdAt: createdAt,
+      likedBy: likedBy,
+    );
+  }
+}

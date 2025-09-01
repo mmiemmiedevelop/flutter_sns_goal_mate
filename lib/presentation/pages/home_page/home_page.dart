@@ -39,35 +39,37 @@ class HomePage extends ConsumerWidget {
 }
 
 // 게시물 하나를 표시하는 위젯
-class PostItem extends StatefulWidget {
+class PostItem extends ConsumerStatefulWidget {
   final Post post;
 
   const PostItem({super.key, required this.post});
 
   @override
-  State<PostItem> createState() => _PostItemState();
+  ConsumerState<PostItem> createState() => _PostItemState();
 }
 
-class _PostItemState extends State<PostItem> {
+class _PostItemState extends ConsumerState<PostItem> {
   // 본문 더보기/접기 상태
   bool _isExpanded = false;
-  // 좋아요 상태
-  bool _isLiked = false;
+  // // 좋아요 상태
+  // bool _isLiked = false;
+  // // 좋아요 숫자 변경을 위한 상태 변수
+  // late int _currentLikeCount;
 
-  // 좋아요 숫자 변경을 위한 상태 변수
-  late int _currentLikeCount;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentLikeCount = widget.post.likeCount;
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _currentLikeCount = widget.post.likeCount;
+  // }
 
   @override
   Widget build(BuildContext context) {
     // 현재 로그인한 유저 ID (임시)
     const currentUserId = 'sorin_dev';
     final isMyPost = widget.post.userId == currentUserId;
+
+    // 좋아요 여부 서버에서 받아서 체크
+    final bool isLiked = widget.post.likedBy.contains(currentUserId);
 
     return Stack(
       fit: StackFit.expand,
@@ -79,7 +81,7 @@ class _PostItemState extends State<PostItem> {
         _buildTopBar(context, isMyPost),
 
         // 3. 우측 액션 버튼 (글쓰기, 좋아요, 댓글)
-        _buildActionButtons(context),
+        _buildActionButtons(context, isLiked),
 
         // 4. 하단 정보 UI (태그, 내용, 수정/삭제 버튼)
         _buildBottomContent(context, isMyPost),
@@ -173,7 +175,7 @@ class _PostItemState extends State<PostItem> {
   }
 
   // 3. 우측 액션 버튼
-  Widget _buildActionButtons(BuildContext context) {
+  Widget _buildActionButtons(BuildContext context, bool isLiked) {
     return Positioned(
       bottom: 240,
       right: 16,
@@ -199,19 +201,24 @@ class _PostItemState extends State<PostItem> {
           const SizedBox(height: 20),
           // 좋아요 버튼
           _buildActionButton(
-            icon: _isLiked ? Icons.favorite : Icons.favorite_border,
-            text: formatNumber(_currentLikeCount),
-            color: _isLiked ? Colors.red : Colors.white,
+            icon: isLiked ? Icons.favorite : Icons.favorite_border,
+            // text: formatNumber(_currentLikeCount),
+            text: formatNumber(widget.post.likeCount),
+
+            color: isLiked ? Colors.red : Colors.white,
             onTap: () {
-              setState(() {
-                _isLiked = !_isLiked;
-                if (_isLiked) {
-                  _currentLikeCount++;
-                } else {
-                  _currentLikeCount--;
-                }
-                // TODO: ViewModel에 좋아요 상태 업데이트 요청 로직 추가
-              });
+              // setState(() {
+              //   isLiked = !isLiked;
+              //   if (_isLiked) {
+              //     currentLikeCount++;
+              //   } else {
+              //     currentLikeCount--;
+              //   }
+              // });
+              // TODO: ViewModel에 좋아요 상태 업데이트 요청 로직 추가
+              ref
+                  .read(homePageViewModelProvider.notifier)
+                  .toggleLikeStatus(widget.post.id);
             },
           ),
           const SizedBox(height: 20),
