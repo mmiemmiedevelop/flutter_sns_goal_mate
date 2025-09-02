@@ -1,21 +1,30 @@
-// 홈 페이지 뷰 모델
-
 import 'package:flutter_princess/domain/entity/post.dart';
-import 'package:flutter_princess/domain/repository/post_repository.dart';
+import 'package:flutter_princess/domain/usecase/delete_post_usecase.dart';
+import 'package:flutter_princess/domain/usecase/fetch_posts_usecase.dart';
+import 'package:flutter_princess/domain/usecase/toggle_like_usecase.dart';
 import 'package:flutter_princess/presentation/pages/home_page/home_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final homePageViewModelProvider =
     StateNotifierProvider<HomePageViewModel, List<Post>>((ref) {
-      final repository = ref.watch(postRepositoryProvider);
-      return HomePageViewModel(repository);
+      return HomePageViewModel(
+        ref.watch(fetchPostsUseCaseProvider),
+        ref.watch(toggleLikeUseCaseProvider),
+        ref.watch(deletePostUseCaseProvider),
+      );
     });
 
 class HomePageViewModel extends StateNotifier<List<Post>> {
-  final PostRepository _repository;
+  final FetchPostsUseCase _fetchPostsUseCase;
+  final ToggleLikeUseCase _toggleLikeUseCase;
+  final DeletePostUseCase _deletePostUseCase;
   bool _isLoading = false;
 
-  HomePageViewModel(this._repository) : super([]) {
+  HomePageViewModel(
+    this._fetchPostsUseCase,
+    this._toggleLikeUseCase,
+    this._deletePostUseCase,
+  ) : super([]) {
     fetchNextPage();
   }
 
@@ -25,10 +34,10 @@ class HomePageViewModel extends StateNotifier<List<Post>> {
     _isLoading = true;
 
     try {
-      final newPosts = await _repository.fetchPosts();
+      final newPosts = await _fetchPostsUseCase.execute();
       state = [...state, ...newPosts];
     } catch (e) {
-      print('Errorrrr');
+      print("Error fetching posts: $e");
     }
     _isLoading = false;
   }
@@ -49,7 +58,7 @@ class HomePageViewModel extends StateNotifier<List<Post>> {
 
     try {
       // repository에게 firebase데이터도 변경 요청
-      await _repository.toggleLike(postId, currentUserId);
+      await _toggleLikeUseCase.execute(postId, currentUserId);
       return true;
     } catch (e) {
       print("Error toggling Like: $e");
@@ -66,7 +75,7 @@ class HomePageViewModel extends StateNotifier<List<Post>> {
     // state 리스트에서 postId가 일치하지 않는 게시물만 남겨서 새로운 리스트 만들기
     state = state.where((post) => post.id != postId).toList();
     try {
-      await _repository.deletePost(postId);
+      await _deletePostUseCase.execute(postId);
       return true;
     } catch (e) {
       print("Error deleting post: $e");

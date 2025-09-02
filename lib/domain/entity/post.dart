@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// entity: 앱의 Domain/Presentation 레이어에서 사용하는 핵심 데이터 모델
 class Post {
   final String id;
   final String userId;
@@ -34,8 +35,10 @@ class Post {
       userId: data['userId'] ?? '',
       userNickname: data['userNickname'] ?? '알 수 없음',
       userProfileImageUrl:
-          data['userProfileImageUrl'] ??
-          'https://placehold.co/100x100/CCCCCC/FFFFFF?text=?',
+          (data['userProfileImageUrl'] == null ||
+              data['userProfileImageUrl'].isEmpty)
+          ? 'https://placehold.co/100x100/CCCCCC/FFFFFF?text=?'
+          : data['userProfileImageUrl'],
       imageUrls: List<String>.from(data['imageUrls'] ?? []),
       content: data['content'] ?? '',
       tags: List<String>.from(data['tags'] ?? []),
@@ -46,6 +49,7 @@ class Post {
     );
   }
 
+  // 좋아요 상태 뒤집기
   Post toggleLike(String userId) {
     final isLiked = likedBy.contains(userId);
     final newLikedBy = List<String>.from(likedBy);
@@ -62,6 +66,7 @@ class Post {
     return copyWith(likedBy: newLikedBy, likeCount: newLikeCount);
   }
 
+  // 객체 일부필드만 변경하여 새로운 복사본 만들어주는 헬퍼 메서드
   Post copyWith({String? id, int? likeCount, List<String>? likedBy}) {
     return Post(
       id: id ?? this.id,
