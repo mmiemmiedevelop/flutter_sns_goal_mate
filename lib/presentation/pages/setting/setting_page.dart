@@ -1,10 +1,90 @@
+// lib/setting/setting_page.dart
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'setting_page_view_model.dart';
 
-class SettingPage extends StatelessWidget {
+class SettingPage extends ConsumerWidget {
   const SettingPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(settingViewModelProvider);
+    final vm = ref.read(settingViewModelProvider.notifier);
+
+    final ImageProvider<Object> imageProvider = state.selectedFile != null
+        ? FileImage(state.selectedFile!)
+        : state.selectedUrl != null
+        ? NetworkImage(state.selectedUrl!)
+        : state.currentProfileUrl != null
+        ? NetworkImage(state.currentProfileUrl!)
+        : const NetworkImage(
+            'https://static.cdn.kmong.com/gigs/jYcIZ1753511586.jpg?w=500',
+          );
+
+    Future<File?> pickImageFromGallery() async {
+      final picker = ImagePicker();
+      final image = await picker.pickImage(source: ImageSource.gallery);
+      if (image == null) return null;
+      return File(image.path);
+    }
+
+    void _onAddButtonTap() async {
+      showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return SizedBox(
+            height: 150,
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.photo_library),
+                  title: const Text('갤러리에서 선택'),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final file = await pickImageFromGallery();
+                    if (file != null) vm.selectFile(file);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.storage),
+                  title: const Text('기존 사진 선택'),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final urls = await vm.getProfileImages();
+                    if (urls.isNotEmpty) {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (_) => SizedBox(
+                          height: 300,
+                          child: ListView.builder(
+                            itemCount: urls.length,
+                            itemBuilder: (_, index) {
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(urls[index]),
+                                ),
+                                title: Text('사진 ${index + 1}'),
+                                onTap: () {
+                                  vm.selectUrl(urls[index]);
+                                  Navigator.pop(context);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -12,9 +92,7 @@ class SettingPage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           '프로필 수정',
@@ -33,19 +111,12 @@ class SettingPage extends StatelessWidget {
             const SizedBox(height: 60),
             Stack(
               children: [
-                const CircleAvatar(
-                  radius: 80,
-                  backgroundImage: NetworkImage(
-                    'https://static.cdn.kmong.com/gigs/jYcIZ1753511586.jpg?w=500',
-                  ),
-                ),
+                CircleAvatar(radius: 80, backgroundImage: imageProvider),
                 Positioned(
                   bottom: 0,
                   right: 0,
                   child: GestureDetector(
-                    onTap: () {
-                      // 프로필 사진 업로드 기능 실행
-                    },
+                    onTap: _onAddButtonTap,
                     child: Container(
                       width: 45,
                       height: 45,
@@ -61,6 +132,22 @@ class SettingPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (state.isUploading)
+                  const Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: SizedBox(
+                      width: 45,
+                      height: 45,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 3,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
             const SizedBox(height: 40),
@@ -74,7 +161,7 @@ class SettingPage extends StatelessWidget {
             ),
             const SizedBox(height: 40),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: state.isUploading ? null : () => vm.saveProfile(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF613EEA),
                 minimumSize: const Size(double.infinity, 50),
@@ -82,10 +169,12 @@ class SettingPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text(
-                '업로드',
-                style: TextStyle(fontSize: 17, color: Colors.white),
-              ),
+              child: state.isUploading
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text(
+                      '저장하기',
+                      style: TextStyle(fontSize: 17, color: Colors.white),
+                    ),
             ),
           ],
         ),
