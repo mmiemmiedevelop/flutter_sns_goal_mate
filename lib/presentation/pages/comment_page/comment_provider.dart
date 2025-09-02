@@ -15,6 +15,6 @@ final fetchCommentUsecaseProvider = Provider<FetchCommentUsecase>((ref) {
 
 // ViewModel Provider (postId별로 관리)
 final commentProvider =
-    NotifierProvider.family<CommentPageViewModel, CommentState, String>(
+    AsyncNotifierProvider.family<CommentPageViewModel, CommentState, String>(
       CommentPageViewModel.new,
     );
