@@ -5,7 +5,6 @@ import 'package:flutter_princess/domain/repository/post_repository.dart';
 
 class PostRepositoryImpl implements PostRepository {
   final PostDataSource _dataSource;
-
   DocumentSnapshot? _lastDocument; // 무한 스크롤을 위해서, 어디까지 작업했는지 확인
 
   PostRepositoryImpl(this._dataSource);

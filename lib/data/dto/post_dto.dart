@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Post Data Transfer Object (데이터 전송 객체)
+/// Firestore와 직접 통신할 때 사용하는 데이터 모델!
+/// 모든 필드는 Nullable('?')로 선언해야 함.
 class PostDto {
   final String? userId;
   final String? userNickname;
