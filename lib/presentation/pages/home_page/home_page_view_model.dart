@@ -51,7 +51,7 @@ class HomePageViewModel extends StateNotifier<List<Post>> {
     ];
   }
 
-  // 게ㅅ,ㅣ글 삭제 함수
+  // 게시글 삭제 함수
   Future<void> deletePost(String postId) async {
     // state 리스트에서 postId가 일치하지 않는 게시물만 남겨서 새로운 리스트 만들기
     state = state.where((post) => post.id != postId).toList();
