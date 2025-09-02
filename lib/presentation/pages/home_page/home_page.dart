@@ -71,9 +71,13 @@ class _PostItemState extends ConsumerState<PostItem> {
 
   @override
   Widget build(BuildContext context) {
+    // User ID
     final userState = ref.watch(userStateViewmodelProvider);
-    // 현재 로그인한 유저 ID (임시)
-    const currentUserId = 'sorin_dev';
+    if (userState == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    final currentUserId = userState.uid;
+
     final isMyPost = widget.post.userId == currentUserId;
 
     // 좋아요 여부 서버에서 받아서 체크
@@ -93,7 +97,6 @@ class _PostItemState extends ConsumerState<PostItem> {
 
         // 4. 하단 정보 UI (태그, 내용, 수정/삭제 버튼)
         _buildBottomContent(context, isMyPost),
-        Center(child: Text(userState!.email)),
       ],
     );
   }
