@@ -13,7 +13,7 @@ class CommentRemoteDataSourceImpl implements CommentRemoteDataSource {
     final snapshot = await firestore
         .collection('comments')
         .where('postId', isEqualTo: postId)
-        .orderBy('createdAt', descending: false) // 시간순 정렬
+        .orderBy('createdAt', descending: true) // 시간순 정렬
         .get();
 
     return snapshot.docs.map((doc) => CommentDto.fromJson(doc.data())).toList();

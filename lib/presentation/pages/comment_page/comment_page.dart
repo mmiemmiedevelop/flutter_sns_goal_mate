@@ -1,9 +1,10 @@
 // 댓글 페이지
 import 'package:flutter/material.dart';
 import 'package:flutter_princess/domain/entity/comment.dart';
+import 'package:flutter_princess/presentation/common_widget/util/formatters.dart';
 import 'package:flutter_princess/presentation/pages/comment_page/comment_page_view_model.dart';
+import 'package:flutter_princess/presentation/pages/comment_page/comment_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 class CommentPage extends ConsumerStatefulWidget {
   final String postId;
@@ -72,8 +73,10 @@ class _CommentPageState extends ConsumerState<CommentPage> {
     final vm = ref.read(commentProvider(widget.postId).notifier);
     return state.when(
       data: (data) => Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text("댓글 ${data.comments.length}"),
+          backgroundColor: Colors.white,
           centerTitle: true,
         ),
         body: RefreshIndicator(
@@ -86,6 +89,11 @@ class _CommentPageState extends ConsumerState<CommentPage> {
             },
             child: Column(
               children: [
+                Divider(
+                  height: 1,
+                  color: const Color.fromARGB(105, 158, 158, 158),
+                ),
+
                 Expanded(
                   child: ListView.separated(
                     itemCount: data.comments.length,
@@ -100,7 +108,7 @@ class _CommentPageState extends ConsumerState<CommentPage> {
                           showDialog(
                             context: context,
                             builder: (context) {
-                              return vertButton(context, comment);
+                              return popup(context, comment);
                             },
                           );
                         },
@@ -117,7 +125,7 @@ class _CommentPageState extends ConsumerState<CommentPage> {
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              formatTime(comment.createdAt),
+                              formatTimestamp(comment.createdAt),
                               style: TextStyle(
                                 fontSize: 11,
                                 color: Colors.grey,
@@ -133,19 +141,21 @@ class _CommentPageState extends ConsumerState<CommentPage> {
                         ),
 
                         // 더보기(수정, 삭제)
-                        trailing: isMine
-                            ? IconButton(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return vertButton(context, comment);
-                                    },
-                                  );
-                                },
-                                icon: Icon(Icons.more_vert),
-                              )
-                            : null,
+                        trailing:
+                            // isMine ?
+                            IconButton(
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    // return vertButton(context, comment);
+                                    return popup(context, comment);
+                                  },
+                                );
+                              },
+                              icon: Icon(Icons.more_vert),
+                            ),
+                        // : null,
                       );
                     },
 
@@ -162,6 +172,8 @@ class _CommentPageState extends ConsumerState<CommentPage> {
                   ),
                 ),
                 Divider(height: 1),
+
+                // 댓글 입력
                 _commentInput(),
               ],
             ),
@@ -174,26 +186,62 @@ class _CommentPageState extends ConsumerState<CommentPage> {
   }
 
   // 더보기 팝업창
-  Widget vertButton(BuildContext context, Comment comment) {
-    return AlertDialog(
-      title: const Text("팝업(게시물 팝업이랑 공통 디자인)"),
-      content: const Text("댓글을 수정하거나 삭제하시겠습니까?"),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            _editComment(comment);
-          },
-          child: const Text("수정"),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            _deleteComment(comment);
-          },
-          child: const Text("삭제"),
-        ),
-      ],
+  Widget popup(BuildContext context, Comment comment) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: 8),
+          ListTile(
+            title: Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Color.fromARGB(134, 96, 62, 234),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: const Text(
+                  "수정하기",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            onTap: () {
+              Navigator.of(context).pop();
+              _editComment(comment);
+            },
+          ),
+          ListTile(
+            title: Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Color(0xFF613EEA),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: const Text(
+                  "삭제하기",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            onTap: () {
+              Navigator.of(context).pop();
+              _deleteComment(comment);
+            },
+          ),
+          SizedBox(height: 6),
+        ],
+      ),
     );
   }
 
@@ -241,7 +289,6 @@ class _CommentPageState extends ConsumerState<CommentPage> {
 
   // 댓글 입력
   Widget _commentInput() {
-    final state = ref.watch(commentProvider(widget.postId));
     final vm = ref.read(commentProvider(widget.postId).notifier);
     final isActive = _commentController.text.trim().isNotEmpty;
 
@@ -299,19 +346,5 @@ class _CommentPageState extends ConsumerState<CommentPage> {
         ),
       ),
     );
-  }
-
-  // 작성시간 포매터
-  formatTime(DateTime datetime) {
-    final now = DateTime.now();
-    final difference = now.difference(datetime);
-
-    if (difference.inMinutes < 60) {
-      return "${difference.inMinutes}분 전";
-    } else if (difference.inHours < 24) {
-      return "${difference.inHours}시간 전";
-    } else {
-      return DateFormat("yyyy-MM-dd").format(datetime);
-    }
   }
 }
