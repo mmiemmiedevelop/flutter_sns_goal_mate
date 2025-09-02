@@ -28,7 +28,49 @@ class WriteDetailPage extends StatelessWidget {
               ),
               trailing: IconButton(
                 icon: const Icon(Icons.more_vert),
-                onPressed: () {},
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      content: const Text('게시글을 수정하거나 삭제하시겠습니까?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('수정하기'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                content: const Text('정말 게시물을 삭제하시겠어요?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('취소'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('삭제하기'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          child: const Text('삭제하기'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 20),
@@ -114,7 +156,7 @@ class WriteDetailPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Container(height: 10, color: const Color(0xFFeaeaea)),
 
                   // 댓글 영역
@@ -151,11 +193,9 @@ class WriteDetailPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    SizedBox(
-                      width: 310,
+                    Expanded(
                       child: Stack(
                         children: [
-                          // 댓글 입력창
                           Container(
                             height: 45,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -175,7 +215,6 @@ class WriteDetailPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          // send 버튼
                           Positioned(
                             right: -4,
                             top: 2,
