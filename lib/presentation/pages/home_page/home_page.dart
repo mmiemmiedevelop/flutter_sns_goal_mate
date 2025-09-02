@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_princess/domain/entity/post.dart';
+import 'package:flutter_princess/presentation/common_widget/util/error_dialogs.dart';
 import 'package:flutter_princess/presentation/common_widget/util/formatters.dart';
 import 'package:flutter_princess/presentation/pages/home_page/home_page_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -174,7 +175,7 @@ class _PostItemState extends ConsumerState<PostItem> {
     );
   }
 
-  // 3. 우측 액션 버튼
+  // 3. 우측 액션 버튼 (새글작성, 좋아요, 댓글)
   Widget _buildActionButtons(
     BuildContext context,
     bool isLiked,
@@ -210,18 +211,14 @@ class _PostItemState extends ConsumerState<PostItem> {
             text: formatNumber(widget.post.likeCount),
 
             color: isLiked ? Colors.red : Colors.white,
-            onTap: () {
-              // setState(() {
-              //   isLiked = !isLiked;
-              //   if (_isLiked) {
-              //     currentLikeCount++;
-              //   } else {
-              //     currentLikeCount--;
-              //   }
-              // });
-              ref
+            onTap: () async {
+              final success = await ref
                   .read(homePageViewModelProvider.notifier)
                   .toggleLikeStatus(widget.post.id, currentUserId);
+
+              if (!success && mounted) {
+                showErrorDialog(context, "좋아요 상태를 변경하는 데 실패했습니다.");
+              }
             },
           ),
           const SizedBox(height: 20),
@@ -371,12 +368,23 @@ class _PostItemState extends ConsumerState<PostItem> {
                                             ListTile(
                                               leading: const Icon(Icons.delete),
                                               title: const Text('게시글 삭제'),
-                                              onTap: () {
+                                              onTap: () async {
                                                 Navigator.pop(
                                                   bottomSheetContext,
                                                 );
-                                                // TODO: ViewModel에 삭제 요청 로직 추가
-                                                print('삭제 기능 구현 필요');
+                                                final success = await ref
+                                                    .read(
+                                                      homePageViewModelProvider
+                                                          .notifier,
+                                                    )
+                                                    .deletePost(widget.post.id);
+
+                                                if (!success && mounted) {
+                                                  showErrorDialog(
+                                                    context,
+                                                    "게시글을 삭제하는 데 실패했습니다.",
+                                                  );
+                                                }
                                               },
                                             ),
                                           ],
