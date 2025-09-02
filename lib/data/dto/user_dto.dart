@@ -23,7 +23,7 @@ class UserDto {
     return UserDto(
       uid: data['uid'] as String,
       email: data['email'] as String,
-      userNickname: data['userNickName'] as String,
+      userNickname: data['userNickname'] as String,
       profileImgUrl: data['profileImgUrl'] as String,
     );
   }
@@ -32,7 +32,7 @@ class UserDto {
   Map<String, dynamic> toFireStore() => {
     'uid': uid,
     'email': email,
-    'userNickName': userNickname,
+    'userNickname': userNickname,
     'profileImgUrl': profileImgUrl,
   };
 }

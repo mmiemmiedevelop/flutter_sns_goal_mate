@@ -21,14 +21,14 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<User?> emailSignup(
-    String password,
     String email,
+    String password,
     String imgUrl,
     String userNickname,
   ) async {
     final source = await userDataSource.emailSignup(
-      password,
       email,
+      password,
       imgUrl,
       userNickname,
     );

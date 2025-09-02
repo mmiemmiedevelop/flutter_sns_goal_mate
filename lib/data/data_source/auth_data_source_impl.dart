@@ -12,6 +12,7 @@ class AuthDataSourceImpl implements AuthDataSource {
       email: email,
       password: password,
     );
+    print('login ok');
 
     final user = cred.user;
     if (user == null) throw StateError('user is null after Login');

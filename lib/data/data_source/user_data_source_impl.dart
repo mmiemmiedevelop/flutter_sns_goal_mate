@@ -46,8 +46,11 @@ class UserDataSourceImpl implements UserDataSource {
       email: email,
       password: password,
     );
+    print('user create ok');
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) throw StateError('uid is null after signup');
+
+    //img
 
     // final userDto = UserDto(
     //   uid: uid,
