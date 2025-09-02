@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 /// 로그인 페이지
@@ -52,14 +53,18 @@ class _SignUpPageState extends State<SignUpPage> {
     if (_formKey.currentState!.validate()) {
       final email = _email.text.trim();
       final password = _password.text;
-      if (_imageFile == null) {
-        
-      }
-      // TODO:회원가입 처리
-      debugPrint('login: $email / $password');
-      //스토리지에 업로드
-      //Url받고
-      //auth 회원가입처리 -> uid나옴 -> firestore User에 저장
+      if (_imageFile == null) {}
+
+      //signupnicknamepage
+      context.pushNamed(
+        'signupnickname',
+        extra: {
+          'email': email,
+          'password': password,
+          'imageFile': _imageFile, // File?
+        },
+      );
+      debugPrint('singuppage: $email / $password/$_imageFile');
     }
   }
 
@@ -81,6 +86,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    final pageController = PageController();
     //화면사이즈 설정용 MediaQuery
     final size = MediaQuery.of(context).size;
     final width = size.width;

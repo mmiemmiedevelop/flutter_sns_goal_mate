@@ -51,12 +51,13 @@ class _LoginPageState extends State<LoginPage> {
       final email = _email.text.trim();
       final password = _password.text;
       // TODO: 로그인 처리
-      debugPrint('login: $email / $password');
+      //debugPrint('login: $email / $password');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final pageController = PageController();
     //화면사이즈 설정용 MediaQuery
     final size = MediaQuery.of(context).size;
     final width = size.width;

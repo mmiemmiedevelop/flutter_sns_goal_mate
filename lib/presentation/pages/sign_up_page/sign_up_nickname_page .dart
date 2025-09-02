@@ -1,17 +1,29 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 /// 로그인 페이지
 class SignUpNickNamePage extends StatefulWidget {
-  const SignUpNickNamePage({super.key});
+  final String email;
+  final String password;
+  final File? imageFile;
+
+  const SignUpNickNamePage({
+    super.key,
+    required this.email,
+    required this.password,
+    this.imageFile,
+  });
 
   @override
   State<SignUpNickNamePage> createState() => _SignUpNickNamePageState();
 }
 
 class _SignUpNickNamePageState extends State<SignUpNickNamePage> {
+  late final String email;
+  late final String password;
   //텍스트폼유효성검사
   final _formKey = GlobalKey<FormState>();
 
@@ -22,9 +34,12 @@ class _SignUpNickNamePageState extends State<SignUpNickNamePage> {
   @override
   void initState() {
     super.initState();
-
     _userNickName = TextEditingController();
-    _password = TextEditingController();
+    _imageFile = widget.imageFile;
+    email = widget.email;
+    password = widget.password;
+
+    // print('$_imageFile $id $password');
   }
 
   @override
@@ -53,20 +68,31 @@ class _SignUpNickNamePageState extends State<SignUpNickNamePage> {
       final ref = FirebaseStorage.instance.ref(
         'users/$userNickName/profile.jpg',
       );
-      final imgbyte = await _imageFile!.readAsBytes();
-      final putData = await ref.putData(imgbyte);
-      putData;
-      putData.metadata;
-      //print(putData.metadata?.fullPath);
+      // final imgbyte = await _imageFile!.readAsBytes();
+      // final putData = await ref.putData(imgbyte);
+
       //Url받고
-      print(putData.ref.getDownloadURL());
-      final imgUrl = putData.ref.getDownloadURL();
+
+      //final imgUrl = putData.ref.getDownloadURL();
       //auth 회원가입처리 -> uid나옴 -> firestore User에 저장
+      try {
+        //회원가입
+        print('$email,$password');
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        print("JOIN 완료");
+      } catch (e) {
+        print(e);
+      }
+      ;
     }
   }
 
   //여기서부터 프로필 이미지 업로드
   File? _imageFile; // 선택된 이미지 파일
+
   final ImagePicker _picker = ImagePicker();
 
   // 갤러리에서 이미지 선택
@@ -83,6 +109,7 @@ class _SignUpNickNamePageState extends State<SignUpNickNamePage> {
 
   @override
   Widget build(BuildContext context) {
+    final pageController = PageController();
     //화면사이즈 설정용 MediaQuery
     final size = MediaQuery.of(context).size;
     final width = size.width;
