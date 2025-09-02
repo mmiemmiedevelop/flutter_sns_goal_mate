@@ -1,11 +1,14 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 /// 로그인 페이지
-class SignUpNickNamePage extends StatefulWidget {
+class SignUpNickNamePage extends ConsumerStatefulWidget {
   final String email;
   final String password;
   final File? imageFile;
@@ -18,10 +21,11 @@ class SignUpNickNamePage extends StatefulWidget {
   });
 
   @override
-  State<SignUpNickNamePage> createState() => _SignUpNickNamePageState();
+  ConsumerState<SignUpNickNamePage> createState() => _SignUpNickNamePageState();
 }
 
-class _SignUpNickNamePageState extends State<SignUpNickNamePage> {
+class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
+  UserViewModel get vm => ref.read(userStateViewmodelProvider.notifier);
   late final String email;
   late final String password;
   //텍스트폼유효성검사
@@ -68,33 +72,26 @@ class _SignUpNickNamePageState extends State<SignUpNickNamePage> {
       final ref = FirebaseStorage.instance.ref(
         'users/$userNickName/profile.jpg',
       );
-      // final imgbyte = await _imageFile!.readAsBytes();
-      // final putData = await ref.putData(imgbyte);
+      final imgbyte = await _imageFile!.readAsBytes();
+      final putData = await ref.putData(imgbyte);
 
       //Url받고
 
-      //final imgUrl = putData.ref.getDownloadURL();
+      final String imgUrl = await putData.ref.getDownloadURL(); //타입확인
       //auth 회원가입처리 -> uid나옴 -> firestore User에 저장
-      try {
-        //회원가입
-        print('$email,$password');
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-        print("JOIN 완료");
-      } catch (e) {
-        print(e);
-      }
-      ;
+
+      vm.signUp(
+        email: email,
+        password: password,
+        imgUrl: imgUrl,
+        userNickName: userNickName,
+      );
     }
   }
 
   //여기서부터 프로필 이미지 업로드
   File? _imageFile; // 선택된 이미지 파일
-
   final ImagePicker _picker = ImagePicker();
-
   // 갤러리에서 이미지 선택
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
