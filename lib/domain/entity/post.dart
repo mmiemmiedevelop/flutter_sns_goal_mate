@@ -30,15 +30,15 @@ class Post {
 
   // Firestore의 Map 데이터와 문서 ID를 받아 Post 객체로 변환하는 팩토리 생성자
   factory Post.fromFirestore(Map<String, dynamic> data, String documentId) {
+    final imageUrlFromDb = data['userProfileImageUrl'] as String?;
+
     return Post(
       id: documentId,
       userId: data['userId'] ?? '',
       userNickname: data['userNickname'] ?? '알 수 없음',
-      userProfileImageUrl:
-          (data['userProfileImageUrl'] == null ||
-              data['userProfileImageUrl'].isEmpty)
-          ? 'https://placehold.co/100x100/CCCCCC/FFFFFF?text=?'
-          : data['userProfileImageUrl'],
+      userProfileImageUrl: (imageUrlFromDb == null || imageUrlFromDb.isEmpty)
+          ? 'assets/img/default_profile.jpg'
+          : imageUrlFromDb,
       imageUrls: List<String>.from(data['imageUrls'] ?? []),
       content: data['content'] ?? '',
       tags: List<String>.from(data['tags'] ?? []),

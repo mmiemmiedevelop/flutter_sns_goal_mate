@@ -9,7 +9,6 @@ import 'package:flutter_princess/presentation/common_widget/util/formatters.dart
 import 'package:flutter_princess/presentation/pages/home_page/home_page_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -52,16 +51,22 @@ class PostItem extends ConsumerStatefulWidget {
 class _PostItemState extends ConsumerState<PostItem> {
   // 본문 더보기/접기 상태
   bool _isExpanded = false;
-  // // 좋아요 상태
-  // bool _isLiked = false;
-  // // 좋아요 숫자 변경을 위한 상태 변수
-  // late int _currentLikeCount;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _currentLikeCount = widget.post.likeCount;
-  // }
+  // 프로필 이미지 받는 로직
+  ImageProvider _getImageProvider(String url) {
+    // Uri.tryParse() : 주어진 문자열(url)이 유효한 URI 형식인지 분석해줌
+    final uri = Uri.tryParse(url);
+
+    //   분석 결과가 성공(null이 아님)했고,
+    //    'scheme' (http, https 등)과 '며쇄갸쇼' (google.com 등)가 모두 존재하는지 확인
+    if (uri != null && uri.hasScheme && uri.hasAuthority) {
+      // 모든 조건을 만족하면, 이것은 유효한 인터넷 주소로 가져오기
+      return CachedNetworkImageProvider(url);
+    } else {
+      // 형식이 맞지 않으면, 로컬 asset 파일로 가져오기
+      return AssetImage(url);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +146,7 @@ class _PostItemState extends ConsumerState<PostItem> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundImage: CachedNetworkImageProvider(
+                backgroundImage: _getImageProvider(
                   widget.post.userProfileImageUrl,
                 ),
               ),
@@ -152,18 +157,18 @@ class _PostItemState extends ConsumerState<PostItem> {
                   Text(
                     widget.post.userNickname,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      shadows: [Shadow(blurRadius: 3, color: Colors.black54)],
+                      shadows: [Shadow(blurRadius: 3, color: Colors.white60)],
                     ),
                   ),
                   Text(
                     formatTimestamp(widget.post.createdAt),
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 12,
-                      shadows: [Shadow(blurRadius: 3, color: Colors.black54)],
+                      shadows: [Shadow(blurRadius: 3, color: Colors.white60)],
                     ),
                   ),
                 ],
