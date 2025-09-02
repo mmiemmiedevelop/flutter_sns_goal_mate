@@ -5,12 +5,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserState {
-  final String? uid;
-  final String? email;
-  final String? profileImgUrl;
-  final String? userNickname;
+  final String uid;
+  final String email;
+  final String profileImgUrl;
+  final String userNickname;
 
-  UserState({this.uid, this.email, this.profileImgUrl, this.userNickname});
+  UserState({
+    required this.uid,
+    required this.email,
+    required this.profileImgUrl,
+    required this.userNickname,
+  });
+
+  @override
+  String toString() {
+    return 'uid: $uid';
+  }
 }
 
 class UserViewModel extends Notifier<UserState?> {
@@ -76,8 +86,14 @@ class UserViewModel extends Notifier<UserState?> {
           profileImgUrl: data['profileImgUrl'] as String,
         );
       }).toList();
-      print(getUser);
+
+      if (getUser.isEmpty) {
+        return false;
+      }
+      print('success');
       //userCredential database에서 user uid찾고 있으면 true, 뷰모델상태도 true로 리턴
+      state = getUser.first;
+      print(state);
       return true;
       //firestore에서 유저정보 불러오고 UserState update
     } on FirebaseAuthException catch (e) {

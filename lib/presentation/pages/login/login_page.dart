@@ -23,7 +23,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   void initState() {
     super.initState();
-
     _email = TextEditingController();
     _password = TextEditingController();
   }
@@ -82,13 +81,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
             children: [
               //logos 이미지
-              Container(
-                child: Column(
-                  children: [
-                    Image.asset('assets/img/logos.png'),
-                    Text('당신의 목표, 함께 달성해요.'),
-                  ],
-                ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset('assets/img/logos.png'),
+                  Text('당신의 목표, 함께 달성해요.'),
+                ],
               ),
               SizedBox(height: 50),
               //로그인폼
