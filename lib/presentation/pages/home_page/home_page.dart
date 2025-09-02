@@ -4,11 +4,11 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_princess/domain/entity/post.dart';
+import 'package:flutter_princess/presentation/common_widget/util/error_dialogs.dart';
 import 'package:flutter_princess/presentation/common_widget/util/formatters.dart';
 import 'package:flutter_princess/presentation/pages/home_page/home_page_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -51,16 +51,22 @@ class PostItem extends ConsumerStatefulWidget {
 class _PostItemState extends ConsumerState<PostItem> {
   // 본문 더보기/접기 상태
   bool _isExpanded = false;
-  // // 좋아요 상태
-  // bool _isLiked = false;
-  // // 좋아요 숫자 변경을 위한 상태 변수
-  // late int _currentLikeCount;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _currentLikeCount = widget.post.likeCount;
-  // }
+  // 프로필 이미지 받는 로직
+  ImageProvider _getImageProvider(String url) {
+    // Uri.tryParse() : 주어진 문자열(url)이 유효한 URI 형식인지 분석해줌
+    final uri = Uri.tryParse(url);
+
+    //   분석 결과가 성공(null이 아님)했고,
+    //    'scheme' (http, https 등)과 '며쇄갸쇼' (google.com 등)가 모두 존재하는지 확인
+    if (uri != null && uri.hasScheme && uri.hasAuthority) {
+      // 모든 조건을 만족하면, 이것은 유효한 인터넷 주소로 가져오기
+      return CachedNetworkImageProvider(url);
+    } else {
+      // 형식이 맞지 않으면, 로컬 asset 파일로 가져오기
+      return AssetImage(url);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +87,7 @@ class _PostItemState extends ConsumerState<PostItem> {
         _buildTopBar(context, isMyPost),
 
         // 3. 우측 액션 버튼 (글쓰기, 좋아요, 댓글)
-        _buildActionButtons(context, isLiked),
+        _buildActionButtons(context, isLiked, currentUserId),
 
         // 4. 하단 정보 UI (태그, 내용, 수정/삭제 버튼)
         _buildBottomContent(context, isMyPost),
@@ -140,7 +146,7 @@ class _PostItemState extends ConsumerState<PostItem> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundImage: CachedNetworkImageProvider(
+                backgroundImage: _getImageProvider(
                   widget.post.userProfileImageUrl,
                 ),
               ),
@@ -151,18 +157,18 @@ class _PostItemState extends ConsumerState<PostItem> {
                   Text(
                     widget.post.userNickname,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      shadows: [Shadow(blurRadius: 3, color: Colors.black54)],
+                      shadows: [Shadow(blurRadius: 3, color: Colors.white60)],
                     ),
                   ),
                   Text(
                     formatTimestamp(widget.post.createdAt),
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 12,
-                      shadows: [Shadow(blurRadius: 3, color: Colors.black54)],
+                      shadows: [Shadow(blurRadius: 3, color: Colors.white60)],
                     ),
                   ),
                 ],
@@ -174,8 +180,12 @@ class _PostItemState extends ConsumerState<PostItem> {
     );
   }
 
-  // 3. 우측 액션 버튼
-  Widget _buildActionButtons(BuildContext context, bool isLiked) {
+  // 3. 우측 액션 버튼 (새글작성, 좋아요, 댓글)
+  Widget _buildActionButtons(
+    BuildContext context,
+    bool isLiked,
+    String currentUserId,
+  ) {
     return Positioned(
       bottom: 240,
       right: 16,
@@ -206,19 +216,14 @@ class _PostItemState extends ConsumerState<PostItem> {
             text: formatNumber(widget.post.likeCount),
 
             color: isLiked ? Colors.red : Colors.white,
-            onTap: () {
-              // setState(() {
-              //   isLiked = !isLiked;
-              //   if (_isLiked) {
-              //     currentLikeCount++;
-              //   } else {
-              //     currentLikeCount--;
-              //   }
-              // });
-              // TODO: ViewModel에 좋아요 상태 업데이트 요청 로직 추가
-              ref
+            onTap: () async {
+              final success = await ref
                   .read(homePageViewModelProvider.notifier)
-                  .toggleLikeStatus(widget.post.id);
+                  .toggleLikeStatus(widget.post.id, currentUserId);
+
+              if (!success && mounted) {
+                showErrorDialog(context, "좋아요 상태를 변경하는 데 실패했습니다.");
+              }
             },
           ),
           const SizedBox(height: 20),
@@ -227,7 +232,9 @@ class _PostItemState extends ConsumerState<PostItem> {
             icon: Icons.comment,
             text: formatNumber(widget.post.commentCount),
             color: Colors.white,
-            onTap: () => context.go('/comment/${widget.post.id}'),
+            onTap: () {
+              context.push('/comment/${widget.post.id}', extra: widget.post);
+            },
           ),
         ],
       ),
@@ -366,12 +373,23 @@ class _PostItemState extends ConsumerState<PostItem> {
                                             ListTile(
                                               leading: const Icon(Icons.delete),
                                               title: const Text('게시글 삭제'),
-                                              onTap: () {
+                                              onTap: () async {
                                                 Navigator.pop(
                                                   bottomSheetContext,
                                                 );
-                                                // TODO: ViewModel에 삭제 요청 로직 추가
-                                                print('삭제 기능 구현 필요');
+                                                final success = await ref
+                                                    .read(
+                                                      homePageViewModelProvider
+                                                          .notifier,
+                                                    )
+                                                    .deletePost(widget.post.id);
+
+                                                if (!success && mounted) {
+                                                  showErrorDialog(
+                                                    context,
+                                                    "게시글을 삭제하는 데 실패했습니다.",
+                                                  );
+                                                }
                                               },
                                             ),
                                           ],
