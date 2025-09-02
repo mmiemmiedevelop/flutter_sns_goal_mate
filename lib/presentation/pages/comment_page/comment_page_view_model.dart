@@ -114,8 +114,3 @@ class CommentPageViewModel extends FamilyAsyncNotifier<CommentState, String> {
     } catch (_) {}
   }
 }
-
-final commentProvider =
-    AsyncNotifierProvider.family<CommentPageViewModel, CommentState, String>(
-      CommentPageViewModel.new,
-    );
