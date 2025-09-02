@@ -33,7 +33,7 @@ class SettingPage extends StatelessWidget {
             const SizedBox(height: 60),
             Stack(
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 80,
                   backgroundImage: NetworkImage(
                     'https://static.cdn.kmong.com/gigs/jYcIZ1753511586.jpg?w=500',
@@ -49,8 +49,8 @@ class SettingPage extends StatelessWidget {
                     child: Container(
                       width: 45,
                       height: 45,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF613EEA),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF613EEA),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(

@@ -45,8 +45,7 @@ class _WritePageState extends State<WritePage> {
       return (await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-              // title: const Text('경고'),
-              content: const Text('나가시면 작성하신 게 지워저요'),
+              content: const Text('나가시면 작성하신 게 지워져요'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
