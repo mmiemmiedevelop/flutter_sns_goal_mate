@@ -4,13 +4,13 @@ import 'package:flutter_princess/presentation/pages/comment_page/comment_page.da
 import 'package:flutter_princess/presentation/pages/home_page/home_page.dart';
 import 'package:flutter_princess/presentation/pages/login/login_page.dart';
 import 'package:flutter_princess/presentation/pages/setting/setting_page.dart';
-import 'package:flutter_princess/presentation/pages/sign_up_page/sign_up_nickname_page%20.dart';
+import 'package:flutter_princess/presentation/pages/sign_up_page/sign_up_nick_name_page%20.dart';
 import 'package:flutter_princess/presentation/pages/sign_up_page/sign_up_page.dart';
 import 'package:flutter_princess/presentation/pages/write_page/write_page.dart';
 import 'package:go_router/go_router.dart';
 
 final router = GoRouter(
-  initialLocation: '/signup',
+  initialLocation: '/login',
 
   routes: [
     GoRoute(

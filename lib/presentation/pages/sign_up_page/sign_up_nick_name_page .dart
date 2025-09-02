@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 /// 로그인 페이지
@@ -84,9 +85,10 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
         email: email,
         password: password,
         imgUrl: imgUrl,
-        userNickName: userNickName,
+        userNickname: userNickName,
       );
     }
+    context.pushNamed('home');
   }
 
   //여기서부터 프로필 이미지 업로드

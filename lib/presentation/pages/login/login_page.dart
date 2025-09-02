@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// 로그인 페이지
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
+  UserViewModel get vm => ref.read(userStateViewmodelProvider.notifier);
   //텍스트폼유효성검사
   final _formKey = GlobalKey<FormState>();
 
@@ -51,7 +55,13 @@ class _LoginPageState extends State<LoginPage> {
       final email = _email.text.trim();
       final password = _password.text;
       // TODO: 로그인 처리
+      vm.login(email, password);
       //debugPrint('login: $email / $password');
+      if (UserState != null) {
+        context.pushNamed('home');
+      } else {
+        print('UserState is null');
+      }
     }
   }
 
@@ -138,7 +148,9 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(height: 25),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          context.pushNamed('signup');
+                        },
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.grey,
                         ),
