@@ -1,32 +1,29 @@
 class User {
   final String uid;
-  final String id;
-  final String userNickName;
+  final String email;
+  final String userNickname;
   final String? profileImgUrl;
-  final DateTime createdAt;
   User({
     required this.uid,
-    required this.id,
-    required this.userNickName,
+    required this.email,
+    required this.userNickname,
     required this.profileImgUrl,
-    required this.createdAt,
   });
   // 닉네임,프로필이미지변경(예정)
   User copyWith({
-    String? id,
-    String? userId,
-    String? postId,
+    String? uid,
+    String? email,
     String? userNickname,
-    String? userProfileImageUrl,
-    String? content,
-    DateTime? createdAt,
+    String? profileImgUrl,
   }) {
     return User(
       uid: this.uid,
-      id: this.id,
-      userNickName: userNickName ?? this.userNickName,
+      email: this.email,
+      userNickname: userNickname ?? this.userNickname,
       profileImgUrl: profileImgUrl ?? this.profileImgUrl,
-      createdAt: this.createdAt,
     );
   }
+
+  String toString() =>
+      'User(uid: $uid, email: $email, nick: $userNickname, profile: $profileImgUrl)';
 }
