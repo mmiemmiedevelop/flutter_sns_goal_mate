@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// 로그인 페이지
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
+  UserViewModel get vm => ref.read(userStateViewmodelProvider.notifier);
   //텍스트폼유효성검사
   final _formKey = GlobalKey<FormState>();
 
@@ -19,7 +23,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-
     _email = TextEditingController();
     _password = TextEditingController();
   }
@@ -51,12 +54,19 @@ class _LoginPageState extends State<LoginPage> {
       final email = _email.text.trim();
       final password = _password.text;
       // TODO: 로그인 처리
-      debugPrint('login: $email / $password');
+      vm.login(email, password);
+      //debugPrint('login: $email / $password');
+      if (UserState != null) {
+        context.pushNamed('home');
+      } else {
+        print('UserState is null');
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final pageController = PageController();
     //화면사이즈 설정용 MediaQuery
     final size = MediaQuery.of(context).size;
     final width = size.width;
@@ -71,13 +81,12 @@ class _LoginPageState extends State<LoginPage> {
 
             children: [
               //logos 이미지
-              Container(
-                child: Column(
-                  children: [
-                    Image.asset('assets/img/logos.png'),
-                    Text('당신의 목표, 함께 달성해요.'),
-                  ],
-                ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset('assets/img/logos.png'),
+                  Text('당신의 목표, 함께 달성해요.'),
+                ],
               ),
               SizedBox(height: 50),
               //로그인폼
@@ -137,7 +146,9 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(height: 25),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          context.pushNamed('signup');
+                        },
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.grey,
                         ),

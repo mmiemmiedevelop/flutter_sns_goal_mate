@@ -7,6 +7,7 @@ import 'package:flutter_princess/domain/entity/post.dart';
 import 'package:flutter_princess/presentation/common_widget/util/error_dialogs.dart';
 import 'package:flutter_princess/presentation/common_widget/util/formatters.dart';
 import 'package:flutter_princess/presentation/pages/home_page/home_page_view_model.dart';
+import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -70,6 +71,7 @@ class _PostItemState extends ConsumerState<PostItem> {
 
   @override
   Widget build(BuildContext context) {
+    final userState = ref.watch(userStateViewmodelProvider);
     // 현재 로그인한 유저 ID (임시)
     const currentUserId = 'sorin_dev';
     final isMyPost = widget.post.userId == currentUserId;
@@ -91,6 +93,7 @@ class _PostItemState extends ConsumerState<PostItem> {
 
         // 4. 하단 정보 UI (태그, 내용, 수정/삭제 버튼)
         _buildBottomContent(context, isMyPost),
+        Center(child: Text(userState!.email)),
       ],
     );
   }

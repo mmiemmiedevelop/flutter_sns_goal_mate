@@ -1,77 +1,99 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 /// 로그인 페이지
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+class SignUpNickNamePage extends ConsumerStatefulWidget {
+  final String email;
+  final String password;
+  final File? imageFile;
+
+  const SignUpNickNamePage({
+    super.key,
+    required this.email,
+    required this.password,
+    this.imageFile,
+  });
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  ConsumerState<SignUpNickNamePage> createState() => _SignUpNickNamePageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
+  UserViewModel get vm => ref.read(userStateViewmodelProvider.notifier);
+  late final String email;
+  late final String password;
   //텍스트폼유효성검사
   final _formKey = GlobalKey<FormState>();
 
   //회원가입폼텍스트컨트롤러 선언
-  late final TextEditingController _email;
+  late final TextEditingController _userNickName;
   late final TextEditingController _password;
 
   @override
   void initState() {
     super.initState();
+    _userNickName = TextEditingController();
+    _imageFile = widget.imageFile;
+    email = widget.email;
+    password = widget.password;
 
-    _email = TextEditingController();
-    _password = TextEditingController();
+    // print('$_imageFile $id $password');
   }
 
   @override
   void dispose() {
-    _email.dispose();
+    _userNickName.dispose();
     _password.dispose();
     super.dispose();
   }
 
-  //이메일검증
-  String? _validateEmail(String? v) {
-    if (v == null || v.isEmpty) return '이메일을 입력해주세요';
-    final ok = RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(v);
-    if (!ok) return '이메일 형식이 올바르지 않습니다';
-    return null;
-  }
-
-  //페스워드검증
-  String? _validatePassword(String? v) {
-    if (v == null || v.isEmpty) return '비밀번호를 입력해주세요';
-    if (v.length < 6) return '비밀번호는 6자 이상이어야 합니다';
+  //닉네임검증
+  String? _validateUserNickName(String? v) {
+    if (v == null || v.isEmpty) return '닉네임을 입력해주세요';
+    //final ok = RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(v);
+    //if (!ok) return '이메일 형식이 올바르지 않습니다';
     return null;
   }
 
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
-      final email = _email.text.trim();
-      final password = _password.text;
+      final userNickName = _userNickName.text.trim();
       if (_imageFile == null) {}
+      // TODO:회원가입 처리
+      debugPrint('userNickName: $userNickName');
 
-      //signupnicknamepage
-      context.pushNamed(
-        'signupnickname',
-        extra: {
-          'email': email,
-          'password': password,
-          'imageFile': _imageFile, // File?
-        },
+      //스토리지에 업로드
+      final ref = FirebaseStorage.instance.ref(
+        'users/$userNickName/profile.jpg',
       );
-      // debugPrint('singuppage: $email / $password/$_imageFile');
+      final imgbyte = await _imageFile!.readAsBytes();
+      final putData = await ref.putData(imgbyte);
+
+      //Url받고
+
+      final String imgUrl = await putData.ref.getDownloadURL(); //타입확인
+      //auth 회원가입처리 -> uid나옴 -> firestore User에 저장
+
+      vm.signUp(
+        email: email,
+        password: password,
+        imgUrl: imgUrl,
+        userNickname: userNickName,
+      );
     }
+    context.pushNamed('home');
   }
 
   //여기서부터 프로필 이미지 업로드
   File? _imageFile; // 선택된 이미지 파일
   final ImagePicker _picker = ImagePicker();
-
   // 갤러리에서 이미지 선택
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -107,8 +129,6 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
               SizedBox(height: 15),
-
-              //프로필 이미지
               Center(
                 child: Stack(
                   children: [
@@ -146,10 +166,10 @@ class _SignUpPageState extends State<SignUpPage> {
                   child: Column(
                     children: [
                       TextFormField(
-                        controller: _email,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next, //엔터누르면 다름필드로
-                        decoration: InputDecoration(hintText: '이메일을 입력해주세요')
+                        controller: _userNickName,
+                        keyboardType: TextInputType.name,
+                        textInputAction: TextInputAction.done, //엔터누르면 다름필드로
+                        decoration: InputDecoration(hintText: '닉네임 입력해주세요')
                             .copyWith(
                               enabledBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.grey),
@@ -158,26 +178,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                 borderSide: BorderSide(color: Colors.grey),
                               ),
                             ),
-                        validator: _validateEmail,
+                        validator: _validateUserNickName,
                       ),
                       SizedBox(height: 15),
-                      TextFormField(
-                        controller: _password,
-                        obscureText: true,
-                        textInputAction:
-                            TextInputAction.done, //엔터누르면 완료 ->onFieldSubmitted
-                        decoration: InputDecoration(hintText: '비밀번호를 입력해주세요')
-                            .copyWith(
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                            ),
-                        validator: _validatePassword,
-                        //onFieldSubmitted: (_) => _submit(),
-                      ),
                       SizedBox(height: 50),
                       Container(
                         width: double.infinity,
@@ -191,7 +194,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          child: const Text('회원가입'),
+                          child: const Text('시작하기'),
                         ),
                       ),
                     ],
