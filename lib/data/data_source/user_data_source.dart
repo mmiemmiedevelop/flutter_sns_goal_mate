@@ -4,9 +4,13 @@ import 'package:flutter_princess/data/dto/user_dto.dart';
 //유저정보를 불러와야함
 abstract interface class UserDataSource {
   //유저정보 불러오기
-  Future<UserDto> fetchUser();
-  //로그인
-  Future<UserDto> emailSignin();
+  //유저정보가 없을수도 있음
+  Future<UserDto?> fetchUser(String uid);
   //회원가입
-  Future<UserDto> emainSignup();
+  Future<UserDto?> emailSignup(
+    String password,
+    String email,
+    String imgUrl,
+    String userNickname,
+  );
 }

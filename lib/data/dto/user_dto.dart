@@ -3,13 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class UserDto {
   final String uid;
   final String email;
-  final String userNickName;
+  final String userNickname;
   final String profileImgUrl;
 
   UserDto({
     required this.uid,
     required this.email,
-    required this.userNickName,
+    required this.userNickname,
     required this.profileImgUrl,
   });
 
@@ -23,7 +23,7 @@ class UserDto {
     return UserDto(
       uid: data['uid'] as String,
       email: data['email'] as String,
-      userNickName: data['userNickName'] as String,
+      userNickname: data['userNickname'] as String,
       profileImgUrl: data['profileImgUrl'] as String,
     );
   }
@@ -32,7 +32,7 @@ class UserDto {
   Map<String, dynamic> toFireStore() => {
     'uid': uid,
     'email': email,
-    'userNickName': userNickName,
+    'userNickname': userNickname,
     'profileImgUrl': profileImgUrl,
   };
 }
