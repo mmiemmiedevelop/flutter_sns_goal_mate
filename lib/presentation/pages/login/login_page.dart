@@ -12,7 +12,6 @@ class LoginPage extends ConsumerStatefulWidget {
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   UserViewModel get vm => ref.read(userStateViewmodelProvider.notifier);
-  bool _loading = false;
   //텍스트폼유효성검사
   final _formKey = GlobalKey<FormState>();
   //로그인폼텍스트컨트롤러 선언
@@ -52,17 +51,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       final email = _email.text.trim();
       final password = _password.text;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> dev
       final ok = await vm.login(email, password);
       if (!mounted) return;
       if (ok) {
+=======
+      // TODO: 로그인 처리
+      vm.login(email, password);
+      //debugPrint('login: $email / $password');
+      if (UserState != null) {
+>>>>>>> parent of a855628 (Merge branch 'dev' into feature/sorin-home-ui)
         context.pushNamed('home');
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('아이디,비밀번호가 틀렸습니다.')));
+        print('UserState is null');
       }
     }
   }
@@ -74,6 +78,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
+<<<<<<< HEAD
     return Stack(
       children: [
         Scaffold(
@@ -162,17 +167,101 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
 >>>>>>> dev
                   //
+=======
+    return Scaffold(
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.only(top: width * 0.3),
+          width: double.infinity,
+          child: ListView(
+            padding: EdgeInsets.symmetric(horizontal: 26),
+
+            children: [
+              //logos 이미지
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset('assets/img/logos.png'),
+                  Text('당신의 목표, 함께 달성해요.'),
+>>>>>>> parent of a855628 (Merge branch 'dev' into feature/sorin-home-ui)
                 ],
               ),
-            ),
+              SizedBox(height: 50),
+              //로그인폼
+              Container(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _email,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next, //엔터누르면 다름필드로
+                        decoration: InputDecoration(hintText: '이메일을 입력해주세요')
+                            .copyWith(
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                              ),
+                            ),
+                        validator: _validateEmail,
+                      ),
+                      SizedBox(height: 15),
+                      TextFormField(
+                        controller: _password,
+                        obscureText: true,
+                        textInputAction:
+                            TextInputAction.done, //엔터누르면 완료 ->onFieldSubmitted
+                        decoration: InputDecoration(hintText: '비밀번호를 입력해주세요')
+                            .copyWith(
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                              ),
+                            ),
+                        validator: _validatePassword,
+                        onFieldSubmitted: (_) => _submit(),
+                      ),
+                      SizedBox(height: 50),
+                      Container(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _submit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF613EEA),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: const Text('로그인'),
+                        ),
+                      ),
+                      SizedBox(height: 25),
+                      TextButton(
+                        onPressed: () {
+                          context.pushNamed('signup');
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.grey,
+                        ),
+                        child: Text('회원가입'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              //
+            ],
           ),
         ),
-        if (_loading)
-          const IgnorePointer(
-            ignoring: true,
-            child: Center(child: CircularProgressIndicator()),
-          ),
-      ],
+      ),
     );
   }
 }

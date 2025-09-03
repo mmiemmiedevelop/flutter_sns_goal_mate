@@ -32,12 +32,9 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
   late final String password;
   //텍스트폼유효성검사
   final _formKey = GlobalKey<FormState>();
-  //닉네임폼텍스트컨트롤러 선언
+
+  //회원가입폼텍스트컨트롤러 선언
   late final TextEditingController _userNickName;
-
-  //로그인로딩 상태
-  bool _loading = false;
-
 
   @override
   void initState() {
@@ -46,6 +43,8 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
     _imageFile = widget.imageFile;
     email = widget.email;
     password = widget.password;
+
+    // print('$_imageFile $id $password');
   }
 
   @override
@@ -54,38 +53,22 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
     super.dispose();
   }
 
+  //닉네임검증
   String? _validateUserNickName(String? v) {
-    if (v == null) return '닉네임을 입력해주세요';
-    final s = v.trim();
-    if (s.isEmpty) return '닉네임을 입력해주세요';
-
-    if (s.length < 2 || s.length > 16) return '닉네임은 2~16자여야 합니다.';
-
-    // 허용 문자 + 시작/끝/연속 구분자 제약
-    final re = RegExp(
-      r'^(?![._])(?!.*[._]{2,})[A-Za-z0-9\uAC00-\uD7A3._]+(?<![._])$',
-    );
-    if (!re.hasMatch(s)) {
-      return '한글/영문/숫자/._ 만 사용, 시작·끝 구분자 금지, 연속 구분자 금지';
-    }
+    if (v == null || v.isEmpty) return '닉네임을 입력해주세요';
+    //final ok = RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(v);
+    //if (!ok) return '이메일 형식이 올바르지 않습니다';
     return null;
   }
 
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
-      final userNickname = _userNickName.text.trim();
-      if (_imageFile == null) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('프로필 이미지를 선택해주세요.')));
-        return;
-      }
-      setState(() => _loading = true);
-      try {
+      final userNickName = _userNickName.text.trim();
+      if (_imageFile != null) {
         final ok = await vm.signUp(
           email: email,
           password: password,
+<<<<<<< HEAD
           imgUrl: _imageFile!,
           userNickname: userNickname,
         );
@@ -107,6 +90,13 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
           setState(() {
             _loading = false;
           });
+=======
+          imgUrl: _imageFile,
+          userNickname: userNickName,
+        );
+        if (!mounted) return;
+        if (ok) context.pushNamed('home');
+>>>>>>> parent of a855628 (Merge branch 'dev' into feature/sorin-home-ui)
       }
     }
   }
@@ -121,16 +111,19 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
     if (pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
+        //TODO: 유저데이터 이미지 url파이어스토리지
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final pageController = PageController();
     //화면사이즈 설정용 MediaQuery
     final size = MediaQuery.of(context).size;
     final width = size.width;
     return Scaffold(
+<<<<<<< HEAD
       appBar: AppBar(),
       body: Stack(
         children: [
@@ -140,16 +133,50 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
               width: double.infinity,
               child: ListView(
                 padding: EdgeInsets.symmetric(horizontal: 26),
+=======
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.only(top: width * 0.2),
+          width: double.infinity,
+          child: ListView(
+            padding: EdgeInsets.symmetric(horizontal: 26),
+>>>>>>> parent of a855628 (Merge branch 'dev' into feature/sorin-home-ui)
 
-                children: [
-                  Container(
-                    child: Text(
-                      '나를 표현할 수 있는 \n프로필과 닉네임을 \n넣어주세요',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
+            children: [
+              Container(
+                child: Text(
+                  '나를 표현할 수 있는 \n프로필과 닉네임을 \n넣어주세요',
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 15),
+              Center(
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 100,
+                      backgroundColor: _imageFile == null
+                          ? const Color.fromARGB(255, 190, 190, 190)
+                          : null,
+                      backgroundImage: _imageFile != null
+                          ? FileImage(_imageFile!)
+                          : null,
+                    ),
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFF613EEA),
+                        ),
+                        child: IconButton(
+                          onPressed: _pickImage,
+                          icon: Icon(Icons.add, color: Colors.white),
+                        ),
                       ),
                     ),
+<<<<<<< HEAD
                   ),
                   SizedBox(height: 15),
                   ProfilePicker(imageFile: _imageFile, onTap: _pickImage),
@@ -196,27 +223,59 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
 
                   //
                 ],
+=======
+                  ],
+                ),
+>>>>>>> parent of a855628 (Merge branch 'dev' into feature/sorin-home-ui)
               ),
-            ),
-          ),
-          if (_loading)
-            IgnorePointer(
-              ignoring: true,
-              child: ColoredBox(
-                color: Color(0x55000000),
-                child: Container(
+              SizedBox(height: 50),
+              //로그인폼
+              Container(
+                child: Form(
+                  key: _formKey,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Center(child: CircularProgressIndicator()),
-                      Center(child: Text('로그인중입니다.')),
+                      TextFormField(
+                        controller: _userNickName,
+                        keyboardType: TextInputType.name,
+                        textInputAction: TextInputAction.done, //엔터누르면 다름필드로
+                        decoration: InputDecoration(hintText: '닉네임 입력해주세요')
+                            .copyWith(
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                              ),
+                            ),
+                        validator: _validateUserNickName,
+                      ),
+                      SizedBox(height: 15),
+                      SizedBox(height: 50),
+                      Container(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _submit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF613EEA),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: const Text('시작하기'),
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
-            ),
-        ],
+
+              //
+            ],
+          ),
+        ),
       ),
     );
   }
