@@ -176,8 +176,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                       fontWeight:
                                           FontWeight.w500, // Roboto Medium
                                       color: Color(0xFF3C4043), // 텍스트 색상
-                                      fontFamily:
-                                          'Roboto', // pubspec.yaml에 Roboto 등록 필요
+                                      fontFamily: 'Roboto',
                                     ),
                                   ),
                                 ],
