@@ -143,6 +143,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               child: const Text('로그인'),
                             ),
                           ),
+                          SizedBox(height: 15),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 55,
+                            child: GestureDetector(
+                              onTap: () {
+                                //TOdo 구글로그인
+                                print('구글');
+                              },
+                              child: Image.asset(
+                                'assets/img/googleAuth.png',
+                                fit: BoxFit.fitWidth,
+                              ),
+                            ),
+                          ),
+
                           SizedBox(height: 25),
                           TextButton(
                             onPressed: () {
