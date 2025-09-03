@@ -7,13 +7,20 @@ import 'package:flutter_princess/presentation/pages/login/login_page.dart';
 import 'package:flutter_princess/presentation/pages/setting/setting_page.dart';
 import 'package:flutter_princess/presentation/pages/sign_up_page/sign_up_nick_name_page%20.dart';
 import 'package:flutter_princess/presentation/pages/sign_up_page/sign_up_page.dart';
+import 'package:flutter_princess/presentation/pages/splash/splash_screen.dart';
 import 'package:flutter_princess/presentation/pages/write_page/write_page.dart';
 import 'package:go_router/go_router.dart';
 
 final router = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/splash',
+
 
   routes: [
+    GoRoute(
+      path: '/splash',
+      name: 'splash',
+      builder: (context, state) => SplashScreen(),
+    ),
     GoRoute(
       path: '/login',
       name: 'login',

@@ -38,7 +38,7 @@ class WritePageViewModel extends StateNotifier<WritePageState> {
   }
 
   Future<void> addPost(Post post) async {
-    ref.read(homePageViewModelProvider.notifier).addPost(post);
+    ref.read(homePageViewModelProvider.notifier).fetchNextPage();
   }
 
   void setUploading(bool value) {
