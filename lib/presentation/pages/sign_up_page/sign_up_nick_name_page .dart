@@ -33,8 +33,10 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
   final _formKey = GlobalKey<FormState>();
   //닉네임폼텍스트컨트롤러 선언
   late final TextEditingController _userNickName;
+
   //로그인로딩 상태
   bool _loading = false;
+
 
   @override
   void initState() {
