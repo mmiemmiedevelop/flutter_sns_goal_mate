@@ -78,15 +78,16 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
         final String imgUrl = await putData.ref.getDownloadURL(); //타입확인
         //auth 회원가입처리 -> uid나옴 -> firestore User에 저장
 
-        vm.signUp(
+        final ok = await vm.signUp(
           email: email,
           password: password,
           imgUrl: imgUrl,
           userNickname: userNickName,
         );
+        if (!mounted) return;
+        if (ok) context.pushNamed('home');
       }
     }
-    context.pushNamed('home');
   }
 
   //여기서부터 프로필 이미지 업로드
