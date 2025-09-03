@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_princess/presentation/common_widget/button.dart';
 import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -149,35 +150,7 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
                     ),
                   ),
                   SizedBox(height: 15),
-                  Center(
-                    child: Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 100,
-                          backgroundColor: _imageFile == null
-                              ? const Color.fromARGB(255, 190, 190, 190)
-                              : null,
-                          backgroundImage: _imageFile != null
-                              ? FileImage(_imageFile!)
-                              : null,
-                        ),
-                        Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(0xFF613EEA),
-                            ),
-                            child: IconButton(
-                              onPressed: _pickImage,
-                              icon: Icon(Icons.add, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  profilePicker(imageFile: _imageFile, onTap: _pickImage),
                   SizedBox(height: 50),
                   //로그인폼
                   Form(
@@ -203,7 +176,6 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
                         SizedBox(height: 50),
                         SizedBox(
                           width: double.infinity,
-                          height: 50,
                           child: ElevatedButton(
                             onPressed: _submit,
                             style: ElevatedButton.styleFrom(
