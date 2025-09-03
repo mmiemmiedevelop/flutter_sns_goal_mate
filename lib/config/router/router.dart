@@ -69,27 +69,10 @@ final router = GoRouter(
         final post = state.extra as Post?;
 
         if (post == null) {
-          return const Scaffold(body: Center(child: Text("오류: 댓글 정보가 없습니다.")));
+          return const Scaffold(body: Center(child: Text("오류: 게시물 정보가 없습니다.")));
         }
-        return Consumer(
-          builder: (context, ref, child) {
-            final userState = ref.watch(userStateViewmodelProvider);
 
-            // ViewModel이 로딩 중일 때
-            if (userState == null) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
-
-            return CommentPage(
-              postId: post.id,
-              userId: userState.uid,
-              userNickname: userState.userNickname,
-              userProfileImageUrl: userState.profileImgUrl,
-            );
-          },
-        );
+        return CommentPage(postId: post.id, postUserId: post.userId);
       },
     ),
   ],
