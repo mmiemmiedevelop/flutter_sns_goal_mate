@@ -319,3 +319,6 @@ fabric.properties
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,android,androidstudio,flutter,xcode,windows,web
+
+#pubspec.lock
+pubspec.lock
