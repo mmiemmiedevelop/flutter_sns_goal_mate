@@ -49,6 +49,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return null;
   }
 
+  //닉네임.프로필설정 화면으로 이동,
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
       final email = _email.text.trim();
@@ -79,7 +80,6 @@ class _SignUpPageState extends State<SignUpPage> {
     if (pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
-        //TODO: 유저데이터 이미지 url파이어스토리지
       });
     }
   }
