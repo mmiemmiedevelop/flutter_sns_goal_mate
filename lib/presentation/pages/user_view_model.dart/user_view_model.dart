@@ -5,7 +5,11 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+<<<<<<< HEAD
+import 'package:flutter_princess/presentation/common_widget/util/get_Img_url.dart';
+=======
 import 'package:flutter_princess/presentation/common_widget/util/get_img_url.dart';
+>>>>>>> dev
 import 'package:flutter_princess/presentation/pages/provider/user_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -55,7 +59,11 @@ class UserViewModel extends Notifier<UserState?> {
       // final imgbyte = await imgUrl!.readAsBytes();
       // final putData = await ref.putData(imgbyte);
       // final String profileImgUrl = await putData.ref.getDownloadURL();
+<<<<<<< HEAD
+      final profileImgUrl = getImgUrl(
+=======
       final profileImgUrl = await getImgUrl(
+>>>>>>> dev
         imageFile: imgUrl,
         path: '${user.uid}/profile.jpg',
       );

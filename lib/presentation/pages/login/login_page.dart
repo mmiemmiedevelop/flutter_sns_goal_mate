@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 /// 로그인 페이지
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
-
   @override
   ConsumerState<LoginPage> createState() => _LoginPageState();
 }
@@ -16,11 +15,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   bool _loading = false;
   //텍스트폼유효성검사
   final _formKey = GlobalKey<FormState>();
-
   //로그인폼텍스트컨트롤러 선언
   late final TextEditingController _email;
   late final TextEditingController _password;
-
   @override
   void initState() {
     super.initState();
@@ -54,7 +51,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (_formKey.currentState!.validate()) {
       final email = _email.text.trim();
       final password = _password.text;
+<<<<<<< HEAD
+=======
 
+>>>>>>> dev
       final ok = await vm.login(email, password);
       if (!mounted) return;
       if (ok) {
@@ -83,7 +83,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               width: double.infinity,
               child: ListView(
                 padding: EdgeInsets.symmetric(horizontal: 26),
+<<<<<<< HEAD
+=======
 
+>>>>>>> dev
                 children: [
                   //logos 이미지
                   Column(
@@ -154,7 +157,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ),
                     ),
                   ),
+<<<<<<< HEAD
+=======
 
+>>>>>>> dev
                   //
                 ],
               ),
