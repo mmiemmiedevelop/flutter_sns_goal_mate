@@ -1,20 +1,83 @@
+// lib/presentation/pages/home_page/home_page.dart
+
+import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_princess/domain/entity/post.dart';
+import 'package:flutter_princess/presentation/common_widget/util/error_dialogs.dart';
 import 'package:flutter_princess/presentation/common_widget/util/formatters.dart';
-import 'package:flutter_princess/presentation/pages/write_page/write_page.dart';
-import 'package:flutter_princess/presentation/pages/setting/setting_page.dart';
 import 'package:flutter_princess/presentation/pages/home_page/home_page_view_model.dart';
+import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final posts = ref.watch(homePageViewModelProvider);
+    final pageController = PageController();
+
+    return Scaffold(
+      // PageView.builder를 사용하여 틱톡처럼 위아래로 스크롤되는 피드를 만듬
+      body: PageView.builder(
+        controller: pageController,
+        scrollDirection: Axis.vertical, // 스크롤 방향을 수직으로 설정
+        itemCount: posts.length,
+        // 무한 스크롤: 페이지가 거의 끝에 도달했을 때 다음 데이터를 불러오기
+        onPageChanged: (index) {
+          if (index == posts.length - 2) {
+            ref.read(homePageViewModelProvider.notifier).fetchNextPage();
+          }
+        },
+        itemBuilder: (context, index) {
+          return PostItem(post: posts[index]);
+        },
+      ),
+    );
+  }
+}
+
+// 게시물 하나를 표시하는 위젯
+class PostItem extends ConsumerStatefulWidget {
+  final Post post;
+
+  const PostItem({super.key, required this.post});
+
+  @override
+  ConsumerState<PostItem> createState() => _PostItemState();
+}
+
+class _PostItemState extends ConsumerState<PostItem> {
+  // 본문 더보기/접기 상태
+  bool _isExpanded = false;
+
+  // 프로필 이미지 받는 로직
+  ImageProvider _getImageProvider(String url) {
+    // Uri.tryParse() : 주어진 문자열(url)이 유효한 URI 형식인지 분석해줌
+    final uri = Uri.tryParse(url);
+
+    //   분석 결과가 성공(null이 아님)했고,
+    //    'scheme' (http, https 등)과 '며쇄갸쇼' (google.com 등)가 모두 존재하는지 확인
+    if (uri != null && uri.hasScheme && uri.hasAuthority) {
+      // 모든 조건을 만족하면, 이것은 유효한 인터넷 주소로 가져오기
+      return CachedNetworkImageProvider(url);
+    } else {
+      // 형식이 맞지 않으면, 로컬 asset 파일로 가져오기
+      return AssetImage(url);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // 현재 로그인한 유저 ID (임시)
-    const currentUserId = 'sorin_dev';
+    // User ID
+    final userState = ref.watch(userStateViewmodelProvider);
+    if (userState == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    final currentUserId = userState.uid;
+
     final isMyPost = widget.post.userId == currentUserId;
 
     // 좋아요 여부 서버에서 받아서 체크
@@ -30,7 +93,7 @@ class HomePage extends StatelessWidget {
         _buildTopBar(context, isMyPost),
 
         // 3. 우측 액션 버튼 (글쓰기, 좋아요, 댓글)
-        _buildActionButtons(context, isLiked),
+        _buildActionButtons(context, isLiked, currentUserId),
 
         // 4. 하단 정보 UI (태그, 내용, 수정/삭제 버튼)
         _buildBottomContent(context, isMyPost),
@@ -78,13 +141,7 @@ class HomePage extends StatelessWidget {
               if (isMyPost)
                 IconButton(
                   icon: const Icon(Icons.settings, color: Colors.black),
-                  // onPressed: () => context.go('/setting'),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const SettingPage()),
-                    );
-                  },
+                  onPressed: () => context.go('/setting'),
                 ),
             ],
           ),
@@ -95,7 +152,7 @@ class HomePage extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundImage: CachedNetworkImageProvider(
+                backgroundImage: _getImageProvider(
                   widget.post.userProfileImageUrl,
                 ),
               ),
@@ -106,18 +163,18 @@ class HomePage extends StatelessWidget {
                   Text(
                     widget.post.userNickname,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      shadows: [Shadow(blurRadius: 3, color: Colors.black54)],
+                      shadows: [Shadow(blurRadius: 3, color: Colors.white60)],
                     ),
                   ),
                   Text(
                     formatTimestamp(widget.post.createdAt),
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 12,
-                      shadows: [Shadow(blurRadius: 3, color: Colors.black54)],
+                      shadows: [Shadow(blurRadius: 3, color: Colors.white60)],
                     ),
                   ),
                 ],
@@ -129,8 +186,12 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // 3. 우측 액션 버튼
-  Widget _buildActionButtons(BuildContext context, bool isLiked) {
+  // 3. 우측 액션 버튼 (새글작성, 좋아요, 댓글)
+  Widget _buildActionButtons(
+    BuildContext context,
+    bool isLiked,
+    String currentUserId,
+  ) {
     return Positioned(
       bottom: 240,
       right: 16,
@@ -142,13 +203,7 @@ class HomePage extends StatelessWidget {
             child: Material(
               color: Colors.deepPurple,
               child: InkWell(
-                // onTap: () => context.go('/write'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const WritePage()),
-                  );
-                },
+                onTap: () => context.go('/write'),
                 child: Container(
                   padding: const EdgeInsets.all(4.0),
                   decoration: BoxDecoration(
@@ -167,19 +222,14 @@ class HomePage extends StatelessWidget {
             text: formatNumber(widget.post.likeCount),
 
             color: isLiked ? Colors.red : Colors.white,
-            onTap: () {
-              // setState(() {
-              //   isLiked = !isLiked;
-              //   if (_isLiked) {
-              //     currentLikeCount++;
-              //   } else {
-              //     currentLikeCount--;
-              //   }
-              // });
-              // TODO: ViewModel에 좋아요 상태 업데이트 요청 로직 추가
-              ref
+            onTap: () async {
+              final success = await ref
                   .read(homePageViewModelProvider.notifier)
-                  .toggleLikeStatus(widget.post.id);
+                  .toggleLikeStatus(widget.post.id, currentUserId);
+
+              if (!success && mounted) {
+                showErrorDialog(context, "좋아요 상태를 변경하는 데 실패했습니다.");
+              }
             },
           ),
           const SizedBox(height: 20),
@@ -188,7 +238,9 @@ class HomePage extends StatelessWidget {
             icon: Icons.comment,
             text: formatNumber(widget.post.commentCount),
             color: Colors.white,
-            onTap: () => context.go('/comment/${widget.post.id}'),
+            onTap: () {
+              context.push('/comment/${widget.post.id}', extra: widget.post);
+            },
           ),
         ],
       ),
@@ -327,12 +379,23 @@ class HomePage extends StatelessWidget {
                                             ListTile(
                                               leading: const Icon(Icons.delete),
                                               title: const Text('게시글 삭제'),
-                                              onTap: () {
+                                              onTap: () async {
                                                 Navigator.pop(
                                                   bottomSheetContext,
                                                 );
-                                                // TODO: ViewModel에 삭제 요청 로직 추가
-                                                print('삭제 기능 구현 필요');
+                                                final success = await ref
+                                                    .read(
+                                                      homePageViewModelProvider
+                                                          .notifier,
+                                                    )
+                                                    .deletePost(widget.post.id);
+
+                                                if (!success && mounted) {
+                                                  showErrorDialog(
+                                                    context,
+                                                    "게시글을 삭제하는 데 실패했습니다.",
+                                                  );
+                                                }
                                               },
                                             ),
                                           ],

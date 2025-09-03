@@ -120,8 +120,8 @@ class SettingPage extends ConsumerWidget {
                     child: Container(
                       width: 45,
                       height: 45,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF613EEA),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF613EEA),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(

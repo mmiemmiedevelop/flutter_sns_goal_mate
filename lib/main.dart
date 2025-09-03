@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_princess/presentation/pages/home_page/home_page.dart';
 import 'package:flutter_princess/config/router/router.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_princess/presentation/pages/login/login_page.dart';
-import 'package:flutter_princess/presentation/pages/setting/setting_page.dart';
-import 'package:flutter_princess/presentation/pages/sign_up_page/sign_up_page.dart';
-import 'package:flutter_princess/presentation/pages/write_page/write_detail_page.dart';
-import 'package:flutter_princess/presentation/pages/write_page/write_page.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart'; // flutterfire configure 로 생성된 파일
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -19,14 +16,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: router, // go_router
       title: 'GoalMate',
-      theme: ThemeData(primarySwatch: Colors.deepPurple),
-      routes: {
-        '/': (context) => const HomePage(),
-        '/write': (context) => const WritePage(),
-      },
-      // home: WritePage(),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
     );
   }
 }
