@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_princess/presentation/common_widget/button.dart';
 import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -85,7 +86,7 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
         final ok = await vm.signUp(
           email: email,
           password: password,
-          imgUrl: _imageFile,
+          imgUrl: _imageFile!,
           userNickname: userNickname,
         );
         if (!mounted) return;
@@ -96,7 +97,7 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
           'email-already-in-use' => '이미 등록된 이메일입니다.',
           'invalid-email' => '이메일 형식이 올바르지 않습니다.',
           'weak-password' => '비밀번호는 6자 이상이어야 합니다.',
-          _ => '회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.',
+          (_) => '회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.',
         };
         ScaffoldMessenger.of(
           context,
@@ -129,8 +130,8 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
     //화면사이즈 설정용 MediaQuery
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    final height = size.height;
     return Scaffold(
+      appBar: AppBar(),
       body: Stack(
         children: [
           SafeArea(
@@ -151,35 +152,7 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
                     ),
                   ),
                   SizedBox(height: 15),
-                  Center(
-                    child: Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 100,
-                          backgroundColor: _imageFile == null
-                              ? const Color.fromARGB(255, 190, 190, 190)
-                              : null,
-                          backgroundImage: _imageFile != null
-                              ? FileImage(_imageFile!)
-                              : null,
-                        ),
-                        Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(0xFF613EEA),
-                            ),
-                            child: IconButton(
-                              onPressed: _pickImage,
-                              icon: Icon(Icons.add, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  ProfilePicker(imageFile: _imageFile, onTap: _pickImage),
                   SizedBox(height: 50),
                   //로그인폼
                   Form(
@@ -205,7 +178,6 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
                         SizedBox(height: 50),
                         SizedBox(
                           width: double.infinity,
-                          height: 50,
                           child: ElevatedButton(
                             onPressed: _submit,
                             style: ElevatedButton.styleFrom(
