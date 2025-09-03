@@ -144,22 +144,48 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ),
                           ),
                           SizedBox(height: 15),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 55,
-                            child: GestureDetector(
-                              onTap: () {
-                                //TOdo 구글로그인
-                                print('구글');
-                              },
-                              child: Image.asset(
-                                'assets/img/googleAuth.png',
-                                fit: BoxFit.fitWidth,
+                          GestureDetector(
+                            onTap: () {
+                              print('Google login');
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFFFFF),
+                                border: Border.all(
+                                  color: const Color(0xFF747775),
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  10,
+                                ), // 권장 4dp
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/img/google.png',
+                                    height: 18, // 로고 권장 크기
+                                  ),
+                                  const SizedBox(width: 10),
+                                  const Text(
+                                    'Sign in with Google',
+                                    style: TextStyle(
+                                      fontSize: 14, // 권장 14sp
+                                      fontWeight:
+                                          FontWeight.w500, // Roboto Medium
+                                      color: Color(0xFF3C4043), // 텍스트 색상
+                                      fontFamily:
+                                          'Roboto', // pubspec.yaml에 Roboto 등록 필요
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
 
-                          SizedBox(height: 25),
+                          SizedBox(height: 15),
                           TextButton(
                             onPressed: () {
                               context.pushNamed('signup');
