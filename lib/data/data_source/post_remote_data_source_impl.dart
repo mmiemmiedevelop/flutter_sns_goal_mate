@@ -61,4 +61,9 @@ class PostRemoteDataSourceImpl implements PostDataSource {
     // 여기에서는 'posts' 컬렉션에서 해당 문서를 삭제함
     return _postsCollection.doc(postId).delete();
   }
+
+  @override
+  Future<void> addPost(String postId, Map<String, dynamic> data) async {
+    await _postsCollection.doc(postId).set(data);
+  }
 }

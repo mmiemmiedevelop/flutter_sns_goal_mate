@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_princess/data/data_source/post_remote_data_source_impl.dart';
 import 'package:flutter_princess/data/repository/post_repository_impl.dart';
-import 'package:flutter_princess/domain/entity/post.dart';
 import 'package:flutter_princess/domain/repository/post_repository.dart';
 import 'package:flutter_princess/domain/usecase/delete_post_usecase.dart';
 import 'package:flutter_princess/domain/usecase/fetch_posts_usecase.dart';
 import 'package:flutter_princess/domain/usecase/toggle_like_usecase.dart';
-import 'package:flutter_princess/presentation/pages/home_page/home_page_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // --- Data layer providers ---
@@ -34,12 +32,3 @@ final toggleLikeUseCaseProvider = Provider(
 final deletePostUseCaseProvider = Provider(
   (ref) => DeletePostUseCase(ref.watch(postRepositoryProvider)),
 );
-
-final homePageViewModelProvider =
-    StateNotifierProvider<HomePageViewModel, List<Post>>((ref) {
-      return HomePageViewModel(
-        ref.watch(fetchPostsUseCaseProvider),
-        ref.watch(toggleLikeUseCaseProvider),
-        ref.watch(deletePostUseCaseProvider),
-      );
-    });
