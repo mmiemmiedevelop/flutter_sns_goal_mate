@@ -10,19 +10,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class CommentPage extends ConsumerStatefulWidget {
   final String postId;
   final String postUserId;
-  // 접속중인 유저 정보 필요
-  // ex) User user or String userID, userNickName etc.
-  // final String userId;
-  // final String userNickname;
-  // final String userProfileImageUrl;
 
   const CommentPage({
     super.key,
     required this.postId,
     required this.postUserId,
-    // required this.userId,
-    // required this.userNickname,
-    // required this.userProfileImageUrl,
   });
 
   @override
@@ -61,9 +53,9 @@ class _CommentPageState extends ConsumerState<CommentPage> {
     if (_commentController.text.trim().isEmpty) return;
 
     vm.sentComment(
-      widget.postUserId,
+      userState!.email,
       widget.postId,
-      userState!.userNickname,
+      userState.userNickname,
       userState.profileImgUrl,
     );
 
@@ -74,7 +66,7 @@ class _CommentPageState extends ConsumerState<CommentPage> {
   @override
   Widget build(BuildContext context) {
     final userState = ref.watch(userStateViewmodelProvider);
-    final currentUserId = userState!.uid;
+    final currentUserId = userState!.email;
 
     final state = ref.watch(commentProvider(widget.postId));
     final vm = ref.read(commentProvider(widget.postId).notifier);
@@ -109,17 +101,19 @@ class _CommentPageState extends ConsumerState<CommentPage> {
                       final comment = data.comments[index];
 
                       // id 비교
-                      final isMine = comment.userId == currentUserId;
+                      final bool isMine = comment.userId == currentUserId;
 
                       return ListTile(
-                        onLongPress: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return popup(context, comment);
-                            },
-                          );
-                        },
+                        onLongPress: isMine
+                            ? () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return popup(context, comment);
+                                  },
+                                );
+                              }
+                            : null,
                         leading: CircleAvatar(
                           backgroundImage: NetworkImage(
                             comment.userProfileImageUrl,
@@ -258,6 +252,7 @@ class _CommentPageState extends ConsumerState<CommentPage> {
           ..selection = TextSelection.fromPosition(
             TextPosition(offset: comment.content.length),
           );
+
     final isActive = editController.text.trim().isNotEmpty;
 
     showDialog(

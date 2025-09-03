@@ -62,13 +62,7 @@ final router = GoRouter(
         if (post == null) {
           return const Scaffold(body: Center(child: Text("오류: 게시물 정보가 없습니다.")));
         }
-        return CommentPage(
-          postId: post.id,
-          postUserId: post.userId,
-          // userId: user.uid,
-          // userNickname: user.userNickname,
-          // userProfileImageUrl: user.profileImgUrl,
-        );
+        return CommentPage(postId: post.id, postUserId: post.userId);
       },
     ),
   ],
