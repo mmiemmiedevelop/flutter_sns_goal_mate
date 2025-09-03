@@ -137,14 +137,20 @@ class _CommentPageState extends ConsumerState<CommentPage> {
                         ),
 
                         // 내용
-                        subtitle: Padding(
-                          padding: EdgeInsets.only(top: 4),
-                          child: Text(comment.content),
-                        ),
+                        subtitle: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Text(comment.content, softWrap: true),
+                              ),
+                            ),
 
-                        // 더보기(수정, 삭제)
-                        trailing: isMine
-                            ? IconButton(
+                            // 더보기(수정, 삭제)
+                            if (isMine)
+                              IconButton(
                                 onPressed: () {
                                   showDialog(
                                     context: context,
@@ -154,8 +160,9 @@ class _CommentPageState extends ConsumerState<CommentPage> {
                                   );
                                 },
                                 icon: Icon(Icons.more_vert),
-                              )
-                            : null,
+                              ),
+                          ],
+                        ),
                       );
                     },
 
@@ -164,14 +171,14 @@ class _CommentPageState extends ConsumerState<CommentPage> {
                       return Column(
                         children: [
                           SizedBox(height: 5),
-                          Divider(height: 1),
+                          Divider(height: 1, color: Colors.grey),
                           SizedBox(height: 5),
                         ],
                       );
                     },
                   ),
                 ),
-                Divider(height: 1),
+                Divider(height: 1, color: Colors.grey),
 
                 // 댓글 입력
                 _commentInput(),
@@ -339,12 +346,14 @@ class _CommentPageState extends ConsumerState<CommentPage> {
                 ),
               ),
             ),
+            SizedBox(width: 4),
 
             // 남은 글자 수
             Text(
               "${_commentController.text.length}/500",
               style: TextStyle(fontSize: 10, fontWeight: FontWeight.w300),
             ),
+            SizedBox(width: 2),
 
             // 전송 버튼
             IconButton(
