@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_princess/presentation/common_widget/theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'splash_viewmodel.dart';
@@ -27,7 +28,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   // 디자인 값들
   final double _finalLogoFontSize = 50.0;
-  final Color _backgroundColor = const Color(0xFF613EEA);
+  final Color _backgroundColor = GoalMateTheme.signatureColor;
 
   @override
   void initState() {
@@ -69,7 +70,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         .animate(
           CurvedAnimation(
             parent: _controller,
-            curve: const Interval(0.20, 0.23, curve: Curves.easeOut),
+            curve: const Interval(0.20, 0.24, curve: Curves.easeOut),
           ),
         );
 
@@ -91,7 +92,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         ]).animate(
           CurvedAnimation(
             parent: _controller,
-            curve: const Interval(0.24, 0.30, curve: Curves.easeInOut),
+            curve: const Interval(0.24, 0.35, curve: Curves.easeInOut),
           ),
         );
 
@@ -125,6 +126,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       // 뒤로가기 방지: viewmodel의 상태가 true가 되면, 현재 스플래시 화면 기록을 없애고 홈화면으로 이동
       if (newState == true) {
         context.pushReplacement('/login');
+        // context.pushReplacement('/home'); // 일단 home
       }
     });
 
@@ -146,10 +148,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           // 'o' 텍스트가 있던 위치를 기준으로 과녁의 최종 위치 계산.
           final double finalLogoImageWidth = screenSize.width; // 전체 로고 이미지의 너비
           final double oRelativeX = finalLogoImageWidth * 0.325;
-
-          // // 최종 위치 미세 조정을 위한 오프셋 값
-          // const double finalPositionOffsetX = -15.0; // 음수 값은 '왼쪽'으로 이동
-          // const double finalPositionOffsetY = -10.0; // 음수 값은 '위쪽'으로 이동
 
           final initialTargetPosition = Offset(
             screenSize.width / 2,
@@ -194,7 +192,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           // --- 4. 화살의 '현재 크기'와 '위치 오프셋' 동적 계산 ---
           final double initialArrowSize = 150.0;
           // 최종 화살 크기는 최종 과녁 크기('o')에 비례하도록 설정
-          final double finalArrowSize = _finalLogoFontSize;
+          final double finalArrowSize = _finalLogoFontSize * 0.8;
           // lerp (선형 보간)를 사용해 현재 화살 크기를 계산
           final double currentArrowSize =
               lerpDouble(
@@ -287,18 +285,19 @@ class TargetPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
-    final paintWhite = Paint()..color = Colors.white;
-    final paintBackground = Paint()..color = backgroundColor;
     final paintWhiteStroke = Paint()
-      ..color = Colors.white
+      ..color = GoalMateTheme.white
       ..style = PaintingStyle.stroke
-      ..strokeWidth = radius * 0.1;
+      ..strokeWidth = radius * 0.05;
 
-    canvas.drawCircle(center, radius, paintWhite);
-    canvas.drawCircle(center, radius * 0.9, paintBackground);
-    canvas.drawCircle(center, radius * 0.7, paintWhiteStroke);
-    canvas.drawCircle(center, radius * 0.4, paintWhite);
-    canvas.drawCircle(center, radius * 0.1, paintBackground);
+    final paintTransparentWhiteFill = Paint()..color = Colors.white10;
+    canvas.drawCircle(center, radius, paintTransparentWhiteFill);
+
+    canvas.drawCircle(center, radius * 0.2, paintWhiteStroke);
+    canvas.drawCircle(center, radius * 0.4, paintWhiteStroke);
+    canvas.drawCircle(center, radius * 0.6, paintWhiteStroke);
+    canvas.drawCircle(center, radius * 0.8, paintWhiteStroke);
+    canvas.drawCircle(center, radius, paintWhiteStroke);
   }
 
   @override

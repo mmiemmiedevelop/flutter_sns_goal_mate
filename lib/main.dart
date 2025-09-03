@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_princess/config/router/router.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_princess/presentation/common_widget/theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart'; // flutterfire configure 로 생성된 파일
 
@@ -18,11 +19,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: router, // go_router
+      theme: GoalMateTheme.lightTheme,
       title: 'GoalMate',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
