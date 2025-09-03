@@ -108,7 +108,7 @@ class _SignUpPageState extends State<SignUpPage> {
               SizedBox(height: 15),
 
               //프로필 이미지
-              profilePicker(imageFile: _imageFile, onTap: _pickImage),
+              ProfilePicker(imageFile: _imageFile, onTap: _pickImage),
               SizedBox(height: 50),
               //로그인폼
               Container(

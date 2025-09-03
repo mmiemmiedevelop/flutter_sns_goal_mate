@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 //프로필 선택
-class profilePicker extends StatelessWidget {
+class ProfilePicker extends StatelessWidget {
   final File? imageFile;
   final VoidCallback onTap;
-  const profilePicker({
+  const ProfilePicker({
     super.key,
     required this.imageFile,
     required this.onTap,
