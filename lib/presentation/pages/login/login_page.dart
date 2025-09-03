@@ -129,29 +129,34 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         onFieldSubmitted: (_) => _submit(),
                       ),
                       SizedBox(height: 50),
-                      Container(
+                      SizedBox(
                         width: double.infinity,
-                        height: 50,
                         child: ElevatedButton(
                           onPressed: _submit,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF613EEA),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
                           child: const Text('로그인'),
                         ),
                       ),
+                      SizedBox(height: 15),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 55,
+                        child: GestureDetector(
+                          onTap: () {
+                            //TOdo 구글로그인
+                            print('구글');
+                          },
+                          child: Image.asset(
+                            'assets/img/googleAuth.png',
+                            fit: BoxFit.fitWidth,
+                          ),
+                        ),
+                      ),
+
                       SizedBox(height: 25),
                       TextButton(
                         onPressed: () {
                           context.pushNamed('signup');
                         },
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.grey,
-                        ),
                         child: Text('회원가입'),
                       ),
                     ],
