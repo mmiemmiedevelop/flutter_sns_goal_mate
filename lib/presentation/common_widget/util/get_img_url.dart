@@ -19,18 +19,38 @@ Future<String> getImgUrl({
     final downloadUrl = await uploadTask.ref.getDownloadURL();
     return downloadUrl;
   } catch (e) {
-    // 예외 처리 (필요하면 로깅이나 사용자 알림 추가)
     throw Exception('이미지 업로드 실패: $e');
   }
 }
-//profile.jpg
 
-Future<List<String>> getImgUrls({
-  required List<File> imageFiles,
-  required String path,
+Future<String> getImgUrls({
+  required File imageFile, //Flie타입 이미지
+  required String path, //경로 (ex=post)
+  required int index, //index
 }) async {
-  final futures = imageFiles.map(
-    (file) => getImgUrl(imageFile: file, path: path),
-  );
+  //경로생성1
+  final name =
+      '${index}_${DateTime.now().millisecondsSinceEpoch}_${imageFile.path.split('/').last}';
+  //fireStore에 경로
+  final ref = FirebaseStorage.instance.ref('users/$path/$name');
+  //이미지 전처리
+  final bytes = await imageFile.readAsBytes();
+  //경로에 이미지 저장
+  final task = await ref.putData(bytes);
+  //url반환
+  return await task.ref.getDownloadURL();
+}
+
+Future<List<String>> uploadImages({
+  required List<File> imageFiles, //file List
+  required String path, // ex=post
+}) async {
+  //리스트 초기화
+  final futures = <Future<String>>[];
+  for (var i = 0; i < imageFiles.length; i++) {
+    //리스트에 추가
+    futures.add(getImgUrls(imageFile: imageFiles[i], path: path, index: i));
+  }
+  //Future가 끝날떄 까지 기다린후 반환
   return Future.wait(futures);
 }
