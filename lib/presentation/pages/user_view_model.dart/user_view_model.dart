@@ -1,13 +1,16 @@
 //signup
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_princess/presentation/pages/provider/user_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 //로그인한 user uid 가져오는법
-//final userState = ref.watch(userStateViewmodelProvider);
-//구독 후 userState?.uid
+// final fecthuser = ref.read(fetchUserusecaseProvider);
+// final userLog = await fecthuser.execute(user.uid);
 class UserState {
   final String uid;
   final String email;
@@ -37,12 +40,21 @@ class UserViewModel extends Notifier<UserState?> {
   Future<bool> signUp({
     required String email,
     required String password,
-    required String imgUrl,
+    required File? imgUrl,
     required String userNickname,
   }) async {
     final usecase = ref.read(emailSignupusecaseProvider);
+
     try {
-      await usecase.execute(email, password, imgUrl, userNickname);
+      final user = await usecase.execute(email, password, '', userNickname);
+      if (user == null) return false;
+
+      final ref = FirebaseStorage.instance.ref('users/${user.uid}/profile.jpg');
+      final imgbyte = await imgUrl!.readAsBytes();
+      final putData = await ref.putData(imgbyte);
+      final String profileImgUrl = await putData.ref.getDownloadURL();
+
+      editProfile(user.uid, userNickname, profileImgUrl);
       return login(email, password);
     } catch (e) {
       print(e);
@@ -63,7 +75,6 @@ class UserViewModel extends Notifier<UserState?> {
         profileImgUrl: user.profileImgUrl ?? '',
         userNickname: user.userNickname,
       );
-
       return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -72,7 +83,35 @@ class UserViewModel extends Notifier<UserState?> {
         print('Wrong password provided for that user.');
       }
     }
+
     return false;
+  }
+
+  //edit
+  Future<bool> editProfile(
+    String uid,
+    String? userNickname,
+    String? profileImgUrl,
+  ) async {
+    final usecase = ref.read(editProfileUsecaseProvider);
+
+    try {
+      final user = await usecase.execute(
+        uid,
+        newUserNickname: userNickname,
+        profileImgUrl: profileImgUrl,
+      );
+      state = UserState(
+        uid: user!.uid,
+        email: user.email,
+        profileImgUrl: user.profileImgUrl ?? '',
+        userNickname: user.userNickname,
+      );
+      return true;
+    } catch (_) {
+      return false;
+    }
+    //return false;
   }
 }
 

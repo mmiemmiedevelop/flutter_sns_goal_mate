@@ -13,4 +13,11 @@ abstract interface class UserDataSource {
     String imgUrl,
     String userNickname,
   );
+  //유저데이터수정
+  Future<UserDto> editProfile(
+    String uid, {
+    //전달된것만 갱신
+    String? profileImgUrl,
+    String? newUserNickname,
+  });
 }

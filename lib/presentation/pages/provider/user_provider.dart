@@ -6,6 +6,7 @@ import 'package:flutter_princess/data/repository/auth_repository_impl.dart';
 import 'package:flutter_princess/data/repository/user_repository_impl.dart';
 import 'package:flutter_princess/domain/repository/auth_repository.dart';
 import 'package:flutter_princess/domain/repository/user_repository.dart';
+import 'package:flutter_princess/domain/usecase/edit_profile_usercase.dart';
 import 'package:flutter_princess/domain/usecase/email_login_usecase.dart';
 import 'package:flutter_princess/domain/usecase/email_signup_usecase.dart';
 import 'package:flutter_princess/domain/usecase/fetch_user_usecase.dart';
@@ -29,6 +30,12 @@ final emailSignupusecaseProvider = Provider((ref) {
   final userRepository = ref.read(_userRepositoryProvider);
   return EmailSignupUsecase(userRepository);
 });
+
+final editProfileUsecaseProvider = Provider((ref) {
+  final userRepository = ref.read(_userRepositoryProvider);
+  return EditProfileUsecase(userRepository);
+});
+
 //user auth
 final _authDataSourceProvider = Provider<AuthDataSource>((ref) {
   return AuthDataSourceImpl();

@@ -10,4 +10,10 @@ abstract interface class UserRepository {
     String imgUrl,
     String userNickname,
   );
+  //프로필수정,프로필등록
+  Future<User> editProfile(
+    String uid, {
+    String? profileImgUrl,
+    String? newUserNickname,
+  });
 }

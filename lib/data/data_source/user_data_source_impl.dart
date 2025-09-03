@@ -5,6 +5,8 @@ import 'package:flutter_princess/data/dto/user_dto.dart';
 
 class UserDataSourceImpl implements UserDataSource {
   final _db = FirebaseFirestore.instance;
+
+  //call User data
   @override
   Future<UserDto> fetchUser(String uid) async {
     //
@@ -13,28 +15,13 @@ class UserDataSourceImpl implements UserDataSource {
         .where('uid', isEqualTo: uid)
         .limit(1)
         .get();
-
     if (snapshot.docs.isEmpty) {
       throw StateError('user not found: $uid');
     }
-
-    // final List<UserDto> getUser = snapshot.docs.map((doc) {
-    //   final data = doc.data() as Map<String, dynamic>;
-    //   return UserDto(
-    //     uid: data['uid'] as String,
-    //     email: data['email'] as String,
-    //     userNickname: data['userNickname'] as String,
-    //     profileImgUrl: data['profileImgUrl'] as String,
-    //   );
-    // }).toList();
-
     return UserDto.fromFirestore(snapshot.docs.first);
-
-    // if (getUser.isEmpty) {
-    //   return null;
-    // }
   }
 
+  //email Signup
   @override
   Future<UserDto> emailSignup(
     String email,
@@ -49,16 +36,6 @@ class UserDataSourceImpl implements UserDataSource {
     print('user create ok');
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) throw StateError('uid is null after signup');
-
-    //img
-
-    // final userDto = UserDto(
-    //   uid: uid,
-    //   email: email,
-    //   userNickname: userNickname,
-    //   profileImgUrl: imgUrl,
-    // );
-
     final ref = await FirebaseFirestore.instance.collection('user').add({
       'uid': uid,
       'email': email,
@@ -66,7 +43,6 @@ class UserDataSourceImpl implements UserDataSource {
       'profileImgUrl': imgUrl,
       'createdAt': FieldValue.serverTimestamp(),
     });
-
     final snap = await FirebaseFirestore.instance
         .collection('user')
         .where('uid', isEqualTo: uid)
@@ -74,5 +50,37 @@ class UserDataSourceImpl implements UserDataSource {
         .get();
 
     return UserDto.fromFirestore(snap.docs.first);
+  }
+
+  //edit userpPofile
+  @override
+  Future<UserDto> editProfile(
+    String uid, {
+    String? profileImgUrl,
+    String? newUserNickname,
+  }) async {
+    // final uid = FirebaseAuth.instance.currentUser?.uid;
+
+    final ref = await FirebaseFirestore.instance
+        .collection('user')
+        .where('uid', isEqualTo: uid)
+        .limit(1)
+        .get();
+    final docRef = ref.docs.first.reference;
+    final updates = <String, dynamic>{};
+
+    if (profileImgUrl != null && profileImgUrl.isNotEmpty) {
+      updates['profileImgUrl'] = profileImgUrl;
+    }
+    if (newUserNickname != null && newUserNickname.isNotEmpty) {
+      updates['userNickname'] = newUserNickname;
+    }
+
+    if (updates.isNotEmpty) {
+      await docRef.update(updates);
+    }
+    final doc = await docRef.get();
+    if (!doc.exists) throw StateError('user not found: $uid');
+    return UserDto.fromFirestore(doc);
   }
 }

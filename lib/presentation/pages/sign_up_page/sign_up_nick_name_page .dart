@@ -65,23 +65,11 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
       final userNickName = _userNickName.text.trim();
-      if (_imageFile == null) {
-        //스토리지에 업로드
-        final ref = FirebaseStorage.instance.ref(
-          'users/$userNickName/profile.jpg',
-        );
-        final imgbyte = await _imageFile!.readAsBytes();
-        final putData = await ref.putData(imgbyte);
-
-        //Url받고
-
-        final String imgUrl = await putData.ref.getDownloadURL(); //타입확인
-        //auth 회원가입처리 -> uid나옴 -> firestore User에 저장
-
+      if (_imageFile != null) {
         final ok = await vm.signUp(
           email: email,
           password: password,
-          imgUrl: imgUrl,
+          imgUrl: _imageFile,
           userNickname: userNickName,
         );
         if (!mounted) return;
