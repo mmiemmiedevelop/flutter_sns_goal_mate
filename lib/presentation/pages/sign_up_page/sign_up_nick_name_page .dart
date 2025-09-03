@@ -34,7 +34,6 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
 
   //회원가입폼텍스트컨트롤러 선언
   late final TextEditingController _userNickName;
-  late final TextEditingController _password;
 
   @override
   void initState() {
@@ -50,7 +49,6 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
   @override
   void dispose() {
     _userNickName.dispose();
-    _password.dispose();
     super.dispose();
   }
 
