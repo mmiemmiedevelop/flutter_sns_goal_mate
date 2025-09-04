@@ -19,7 +19,7 @@ class WritePage extends ConsumerStatefulWidget {
 class _WritePageState extends ConsumerState<WritePage> {
   final TextEditingController _tagController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
-  final int _maxCharacters = 100;
+  final int _maxCharacters = 1000;
   int _currentCharacters = 0;
 
   @override

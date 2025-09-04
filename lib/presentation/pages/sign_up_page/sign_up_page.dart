@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_princess/main.dart';
 import 'package:flutter_princess/presentation/common_widget/button.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,6 +24,12 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   void initState() {
     super.initState();
+    //analytics
+    analytics.logScreenView(
+      screenName: 'signup_page',
+      screenClass: 'SignUpPage',
+    );
+
     _email = TextEditingController();
     _password = TextEditingController();
     _confirmPassword = TextEditingController();
@@ -173,7 +180,18 @@ class _SignUpPageState extends State<SignUpPage> {
                               ),
                             ),
                         validator: _validateConfirmPassword,
-                        onFieldSubmitted: (_) => _submit(),
+                        onFieldSubmitted: (_) {
+                          _submit();
+                          {
+                            analytics.logEvent(
+                              name: 'btn_click',
+                              parameters: {
+                                'id': 'signup_submit',
+                                'screen': 'signup_page',
+                              },
+                            );
+                          }
+                        },
                       ),
                       SizedBox(height: 50),
                       Container(

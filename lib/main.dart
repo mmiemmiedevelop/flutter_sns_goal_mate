@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_princess/config/router/router.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -5,12 +6,13 @@ import 'package:flutter_princess/presentation/common_widget/theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-// flutterfire configure 로 생성된 파일
 
+// flutterfire configure 로 생성된 파일
+late final FirebaseAnalytics analytics;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
+  analytics = FirebaseAnalytics.instance;
   await SentryFlutter.init(
     (options) {
       options.dsn =
