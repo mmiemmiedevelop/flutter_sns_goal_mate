@@ -53,7 +53,6 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
   @override
   void dispose() {
     _userNickName.dispose();
-    _password.dispose();
     super.dispose();
   }
 
