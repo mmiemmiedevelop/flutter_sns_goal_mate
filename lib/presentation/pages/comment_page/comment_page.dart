@@ -4,22 +4,17 @@ import 'package:flutter_princess/domain/entity/comment.dart';
 import 'package:flutter_princess/presentation/common_widget/util/formatters.dart';
 import 'package:flutter_princess/presentation/pages/comment_page/comment_page_view_model.dart';
 import 'package:flutter_princess/presentation/pages/comment_page/comment_provider.dart';
+import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CommentPage extends ConsumerStatefulWidget {
   final String postId;
-  // 접속중인 유저 정보 필요
-  // ex) User user or String userID, userNickName etc.
-  final String userId;
-  final String userNickname;
-  final String userProfileImageUrl;
+  final String postUserId;
 
   const CommentPage({
     super.key,
     required this.postId,
-    required this.userId,
-    required this.userNickname,
-    required this.userProfileImageUrl,
+    required this.postUserId,
   });
 
   @override
@@ -53,14 +48,15 @@ class _CommentPageState extends ConsumerState<CommentPage> {
   // 댓글 전송 로직
   void _sentComment() {
     final vm = ref.read(commentProvider(widget.postId).notifier);
+    final userState = ref.watch(userStateViewmodelProvider);
 
     if (_commentController.text.trim().isEmpty) return;
 
     vm.sentComment(
-      widget.userId,
+      userState!.email,
       widget.postId,
-      widget.userNickname,
-      widget.userProfileImageUrl,
+      userState.userNickname,
+      userState.profileImgUrl,
     );
 
     _commentController.clear();
@@ -69,8 +65,12 @@ class _CommentPageState extends ConsumerState<CommentPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userState = ref.watch(userStateViewmodelProvider);
+    final currentUserId = userState!.email;
+
     final state = ref.watch(commentProvider(widget.postId));
     final vm = ref.read(commentProvider(widget.postId).notifier);
+
     return state.when(
       data: (data) => Scaffold(
         backgroundColor: Colors.white,
@@ -101,17 +101,19 @@ class _CommentPageState extends ConsumerState<CommentPage> {
                       final comment = data.comments[index];
 
                       // id 비교
-                      final isMine = comment.userId == widget.userId;
+                      final bool isMine = comment.userId == currentUserId;
 
                       return ListTile(
-                        onLongPress: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return popup(context, comment);
-                            },
-                          );
-                        },
+                        onLongPress: isMine
+                            ? () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return popup(context, comment);
+                                  },
+                                );
+                              }
+                            : null,
                         leading: CircleAvatar(
                           backgroundImage: NetworkImage(
                             comment.userProfileImageUrl,
@@ -135,27 +137,32 @@ class _CommentPageState extends ConsumerState<CommentPage> {
                         ),
 
                         // 내용
-                        subtitle: Padding(
-                          padding: EdgeInsets.only(top: 4),
-                          child: Text(comment.content),
-                        ),
-
-                        // 더보기(수정, 삭제)
-                        trailing:
-                            // isMine ?
-                            IconButton(
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    // return vertButton(context, comment);
-                                    return popup(context, comment);
-                                  },
-                                );
-                              },
-                              icon: Icon(Icons.more_vert),
+                        subtitle: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Text(comment.content, softWrap: true),
+                              ),
                             ),
-                        // : null,
+
+                            // 더보기(수정, 삭제)
+                            if (isMine)
+                              IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return popup(context, comment);
+                                    },
+                                  );
+                                },
+                                icon: Icon(Icons.more_vert),
+                              ),
+                          ],
+                        ),
                       );
                     },
 
@@ -164,14 +171,14 @@ class _CommentPageState extends ConsumerState<CommentPage> {
                       return Column(
                         children: [
                           SizedBox(height: 5),
-                          Divider(height: 1),
+                          Divider(height: 1, color: Colors.grey),
                           SizedBox(height: 5),
                         ],
                       );
                     },
                   ),
                 ),
-                Divider(height: 1),
+                Divider(height: 1, color: Colors.grey),
 
                 // 댓글 입력
                 _commentInput(),
@@ -247,18 +254,32 @@ class _CommentPageState extends ConsumerState<CommentPage> {
 
   // 댓글 수정
   void _editComment(Comment comment) {
-    final TextEditingController editController = TextEditingController(
-      text: comment.content,
-    );
+    final TextEditingController editController =
+        TextEditingController(text: comment.content)
+          ..selection = TextSelection.fromPosition(
+            TextPosition(offset: comment.content.length),
+          );
+
+    final isActive = editController.text.trim().isNotEmpty;
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           title: Text("댓글 수정"),
           content: TextField(
             controller: editController,
             maxLength: 500,
-            decoration: InputDecoration(hintText: "댓글을 입력하세요", counterText: ""),
+            maxLines: isActive ? 2 : 1,
+            onChanged: (value) {
+              setState(() {});
+            },
+            decoration: InputDecoration(
+              hintText: "댓글을 입력하세요",
+              border: InputBorder.none,
+              counterText: "",
+            ),
           ),
           actions: [
             TextButton(
@@ -273,7 +294,7 @@ class _CommentPageState extends ConsumerState<CommentPage> {
                 vm.editComment(comment.id, editController.text);
                 Navigator.of(context).pop();
               },
-              child: Text("수정"),
+              child: Text("수정", style: TextStyle(color: Color(0xFF613EEA))),
             ),
           ],
         );
@@ -289,6 +310,8 @@ class _CommentPageState extends ConsumerState<CommentPage> {
 
   // 댓글 입력
   Widget _commentInput() {
+    final userState = ref.watch(userStateViewmodelProvider);
+
     final vm = ref.read(commentProvider(widget.postId).notifier);
     final isActive = _commentController.text.trim().isNotEmpty;
 
@@ -302,7 +325,7 @@ class _CommentPageState extends ConsumerState<CommentPage> {
             SizedBox(width: 4),
             CircleAvatar(
               radius: 16,
-              backgroundImage: NetworkImage(widget.userProfileImageUrl),
+              backgroundImage: NetworkImage(userState!.profileImgUrl),
             ),
             SizedBox(width: 8),
 
@@ -323,12 +346,14 @@ class _CommentPageState extends ConsumerState<CommentPage> {
                 ),
               ),
             ),
+            SizedBox(width: 4),
 
             // 남은 글자 수
             Text(
               "${_commentController.text.length}/500",
               style: TextStyle(fontSize: 10, fontWeight: FontWeight.w300),
             ),
+            SizedBox(width: 2),
 
             // 전송 버튼
             IconButton(

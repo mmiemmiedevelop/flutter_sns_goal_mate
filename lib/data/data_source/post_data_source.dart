@@ -9,4 +9,5 @@ abstract class PostDataSource {
   Future<void> toggleLike(String postId, String userId);
   // 게시물을 삭제하는 기능
   Future<void> deletePost(String postId);
+  Future<void> addPost(String postId, Map<String, dynamic> data);
 }

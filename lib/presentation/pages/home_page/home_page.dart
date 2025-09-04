@@ -4,9 +4,10 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_princess/domain/entity/post.dart';
+import 'package:flutter_princess/presentation/common_widget/theme/theme.dart';
 import 'package:flutter_princess/presentation/common_widget/util/error_dialogs.dart';
 import 'package:flutter_princess/presentation/common_widget/util/formatters.dart';
-import 'package:flutter_princess/presentation/pages/home_page/home_page_view_model.dart';
+import 'package:flutter_princess/presentation/pages/provider/home_provider.dart';
 import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -132,7 +133,7 @@ class _PostItemState extends ConsumerState<PostItem> {
                 'GoalMate',
                 style: TextStyle(
                   fontFamily: 'NotoSansKR',
-                  color: Colors.black,
+                  color: GoalMateTheme.black,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -140,7 +141,7 @@ class _PostItemState extends ConsumerState<PostItem> {
 
               if (isMyPost)
                 IconButton(
-                  icon: const Icon(Icons.settings, color: Colors.black),
+                  icon: const Icon(Icons.settings, color: GoalMateTheme.black),
                   onPressed: () => context.go('/setting'),
                 ),
             ],
@@ -163,7 +164,7 @@ class _PostItemState extends ConsumerState<PostItem> {
                   Text(
                     widget.post.userNickname,
                     style: const TextStyle(
-                      color: Colors.black,
+                      color: GoalMateTheme.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                       shadows: [Shadow(blurRadius: 3, color: Colors.white60)],
@@ -172,7 +173,7 @@ class _PostItemState extends ConsumerState<PostItem> {
                   Text(
                     formatTimestamp(widget.post.createdAt),
                     style: const TextStyle(
-                      color: Colors.black,
+                      color: GoalMateTheme.black,
                       fontSize: 12,
                       shadows: [Shadow(blurRadius: 3, color: Colors.white60)],
                     ),
@@ -201,7 +202,7 @@ class _PostItemState extends ConsumerState<PostItem> {
           ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
             child: Material(
-              color: Colors.deepPurple,
+              color: GoalMateTheme.signatureColor,
               child: InkWell(
                 onTap: () => context.go('/write'),
                 child: Container(
@@ -209,7 +210,11 @@ class _PostItemState extends ConsumerState<PostItem> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
-                  child: const Icon(Icons.add, color: Colors.white, size: 25),
+                  child: const Icon(
+                    Icons.add,
+                    color: GoalMateTheme.white,
+                    size: 25,
+                  ),
                 ),
               ),
             ),
@@ -221,7 +226,7 @@ class _PostItemState extends ConsumerState<PostItem> {
             // text: formatNumber(_currentLikeCount),
             text: formatNumber(widget.post.likeCount),
 
-            color: isLiked ? Colors.red : Colors.white,
+            color: isLiked ? Colors.red : GoalMateTheme.white,
             onTap: () async {
               final success = await ref
                   .read(homePageViewModelProvider.notifier)
@@ -237,7 +242,7 @@ class _PostItemState extends ConsumerState<PostItem> {
           _buildActionButton(
             icon: Icons.comment,
             text: formatNumber(widget.post.commentCount),
-            color: Colors.white,
+            color: GoalMateTheme.white,
             onTap: () {
               context.push('/comment/${widget.post.id}', extra: widget.post);
             },
@@ -268,7 +273,7 @@ class _PostItemState extends ConsumerState<PostItem> {
           Text(
             text,
             style: const TextStyle(
-              color: Colors.white,
+              color: GoalMateTheme.white,
               fontWeight: FontWeight.bold,
               shadows: [Shadow(blurRadius: 2, color: Colors.black54)],
             ),
@@ -326,7 +331,7 @@ class _PostItemState extends ConsumerState<PostItem> {
                                   (tag) => Text(
                                     tag,
                                     style: const TextStyle(
-                                      color: Colors.white,
+                                      color: GoalMateTheme.white,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -343,13 +348,13 @@ class _PostItemState extends ConsumerState<PostItem> {
                                 constraints: const BoxConstraints(),
                                 icon: const Icon(
                                   Icons.more_horiz,
-                                  color: Colors.white,
+                                  color: GoalMateTheme.white,
                                 ),
                                 onPressed: () {
                                   // showModalBottomSheet: 화면 아래에서 올라오는 옵션 메뉴(바텀 시트)를 표시
                                   showModalBottomSheet(
                                     context: builderContext,
-                                    backgroundColor: Colors.white,
+                                    backgroundColor: GoalMateTheme.white,
                                     builder: (bottomSheetContext) {
                                       return Padding(
                                         padding: EdgeInsets.only(
@@ -416,7 +421,7 @@ class _PostItemState extends ConsumerState<PostItem> {
                         child: Text(
                           widget.post.content,
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: GoalMateTheme.white,
                             fontSize: 15,
                           ),
                           maxLines: _isExpanded
