@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 /// 로그인 페이지
 class LoginPage extends ConsumerStatefulWidget {
@@ -67,13 +69,42 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
+  Future<void> _google() async {
+    setState(() {
+      _loading = true;
+    });
+
+    try {
+      await vm.googleLogin();
+      if (!mounted) return;
+
+      if (FirebaseAuth.instance.currentUser != null) {
+        context.pushNamed('home');
+        print('Google 로그인 성공');
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Google 로그인에 실패했습니다.')));
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Google 로그인 오류: $e')));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final pageController = PageController();
     //화면사이즈 설정용 MediaQuery
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    final height = size.height;
     return Stack(
       children: [
         Scaffold(
@@ -146,7 +177,49 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               child: const Text('로그인'),
                             ),
                           ),
-                          SizedBox(height: 25),
+                          SizedBox(height: 15),
+                          GestureDetector(
+                            onTap: () {
+                              print('Google login');
+                              _google();
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFFFFF),
+                                border: Border.all(
+                                  color: const Color(0xFF747775),
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  10,
+                                ), // 권장 4dp
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/img/google.png',
+                                    height: 18, // 로고 권장 크기
+                                  ),
+                                  const SizedBox(width: 10),
+                                  const Text(
+                                    'Sign in with Google',
+                                    style: TextStyle(
+                                      fontSize: 14, // 권장 14sp
+                                      fontWeight:
+                                          FontWeight.w500, // Roboto Medium
+                                      color: Color(0xFF3C4043), // 텍스트 색상
+                                      fontFamily: 'Roboto',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(height: 15),
                           TextButton(
                             onPressed: () {
                               context.pushNamed('signup');

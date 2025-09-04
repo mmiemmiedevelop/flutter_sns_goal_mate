@@ -50,3 +50,8 @@ final emailLoginUsecaseProvider = Provider((ref) {
   final authRepository = ref.read(_authRepositoryProvider);
   return EmailLoginUsecase(authRepository);
 });
+
+final googleLoginUsecaseProvider = Provider((ref) {
+  final authRepository = ref.read(_authRepositoryProvider);
+  return GoogleLoginUsecase(authRepository);
+});
