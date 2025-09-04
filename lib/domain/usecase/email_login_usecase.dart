@@ -9,3 +9,12 @@ class EmailLoginUsecase {
     return await authRepository.emailLogin(email, password);
   }
 }
+
+class GoogleLoginUsecase {
+  final AuthRepository authRepository;
+  GoogleLoginUsecase(this.authRepository);
+
+  Future<User?> execute() async {
+    return await authRepository.googleLogin();
+  }
+}

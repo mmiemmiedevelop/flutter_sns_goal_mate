@@ -18,4 +18,16 @@ class AuthRepositoryImpl implements AuthRepository {
       profileImgUrl: source.profileImgUrl,
     );
   }
+
+  @override
+  Future<User?> googleLogin() async {
+    final source = await authDataSource.googleLogin();
+
+    return User(
+      uid: source.uid,
+      email: source.email,
+      userNickname: source.userNickname,
+      profileImgUrl: source.profileImgUrl,
+    );
+  }
 }

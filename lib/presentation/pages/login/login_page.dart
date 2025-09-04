@@ -69,9 +69,36 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
-  // Future<void> _google() async {
-  //   final gogo = await vm.googleLogin();
-  // }
+  Future<void> _google() async {
+    setState(() {
+      _loading = true;
+    });
+
+    try {
+      await vm.googleLogin();
+      if (!mounted) return;
+
+      if (FirebaseAuth.instance.currentUser != null) {
+        context.pushNamed('home');
+        print('Google 로그인 성공');
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Google 로그인에 실패했습니다.')));
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Google 로그인 오류: $e')));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,7 +178,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           GestureDetector(
                             onTap: () {
                               print('Google login');
-                              // _google();
+                              _google();
                             },
                             child: Container(
                               width: double.infinity,
