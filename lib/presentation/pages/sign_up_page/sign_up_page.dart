@@ -19,13 +19,13 @@ class _SignUpPageState extends State<SignUpPage> {
   //회원가입폼텍스트컨트롤러 선언
   late final TextEditingController _email;
   late final TextEditingController _password;
-
+  late final TextEditingController _confirmPassword;
   @override
   void initState() {
     super.initState();
-
     _email = TextEditingController();
     _password = TextEditingController();
+    _confirmPassword = TextEditingController();
   }
 
   @override
@@ -47,7 +47,16 @@ class _SignUpPageState extends State<SignUpPage> {
   String? _validatePassword(String? v) {
     if (v == null || v.isEmpty) return '비밀번호를 입력해주세요';
     if (v.length < 6) return '비밀번호는 6자 이상이어야 합니다';
+    // 필요 시 정책 강화:
+    // if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d).{6,}$').hasMatch(v)) return '영문+숫자 포함';
     return null;
+  }
+
+  //비밀번호 일치 확인
+  String? _validateConfirmPassword(String? v) {
+    if (v == null || v.isEmpty) return '비밀번호를 확인해주세요';
+    if (v != _password.text) return '비밀번호가 일치 하지 않습니다';
+    //return null;
   }
 
   //닉네임.프로필설정 화면으로 이동,
@@ -136,7 +145,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         controller: _password,
                         obscureText: true,
                         textInputAction:
-                            TextInputAction.done, //엔터누르면 완료 ->onFieldSubmitted
+                            TextInputAction.next, //엔터누르면 완료 ->onFieldSubmitted
                         decoration: InputDecoration(hintText: '비밀번호를 입력해주세요')
                             .copyWith(
                               enabledBorder: UnderlineInputBorder(
@@ -148,6 +157,23 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                         validator: _validatePassword,
                         //onFieldSubmitted: (_) => _submit(),
+                      ),
+                      TextFormField(
+                        controller: _confirmPassword,
+                        obscureText: true,
+                        textInputAction:
+                            TextInputAction.done, //엔터누르면 완료 ->onFieldSubmitted
+                        decoration: InputDecoration(hintText: '비밀번호를 다시 입력해주세요')
+                            .copyWith(
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                              ),
+                            ),
+                        validator: _validateConfirmPassword,
+                        onFieldSubmitted: (_) => _submit(),
                       ),
                       SizedBox(height: 50),
                       Container(
