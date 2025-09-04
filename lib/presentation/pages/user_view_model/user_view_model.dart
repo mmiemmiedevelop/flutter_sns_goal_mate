@@ -127,9 +127,10 @@ class UserViewModel extends Notifier<UserState?> {
         profileImgUrl: finalProfileImgUrl,
       );
 
+      if (user == null) return false;
+
       final prevImageUrl = state?.profileImgUrl ?? '';
       final updatedImageUrl = user.profileImgUrl ?? prevImageUrl;
-
       state = UserState(
         uid: user.uid,
         email: user.email,
