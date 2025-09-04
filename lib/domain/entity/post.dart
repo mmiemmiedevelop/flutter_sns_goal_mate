@@ -83,3 +83,21 @@ class Post {
     );
   }
 }
+
+// 업로드
+extension PostJson on Post {
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'userNickname': userNickname,
+      'userProfileImageUrl': userProfileImageUrl,
+      'imageUrls': imageUrls,
+      'tags': tags,
+      'content': content,
+      'createdAt': createdAt,
+      'likeCount': likeCount,
+      'commentCount': commentCount,
+      'likedBy': likedBy,
+    };
+  }
+}
