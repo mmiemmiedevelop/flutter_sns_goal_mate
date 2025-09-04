@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>206708911603-impl629unguvs45gqs54a3ftl64c6vvh.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.206708911603-impl629unguvs45gqs54a3ftl64c6vvh</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>206708911603-vtljdc115rrfetv8cdp7o7i65vc461cn.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDMKEz8QGrF-GsPnPnQPx0-WHk-uDSwlG8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>206708911603</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.flutterPrincess</string>
+	<key>PROJECT_ID</key>
+	<string>flutter-snsloca</string>
+	<key>STORAGE_BUCKET</key>
+	<string>flutter-snsloca.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:206708911603:ios:763cb64939149b01d83686</string>
+</dict>
+</plist>
