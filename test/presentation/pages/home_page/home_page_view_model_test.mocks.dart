@@ -37,9 +37,9 @@ class MockFetchPostsUseCase extends _i1.Mock implements _i2.FetchPostsUseCase {
   }
 
   @override
-  _i3.Future<List<_i4.Post>> execute() =>
+  _i3.Future<List<_i4.Post>> execute({bool? reset = false}) =>
       (super.noSuchMethod(
-            Invocation.method(#execute, []),
+            Invocation.method(#execute, [], {#reset: reset}),
             returnValue: _i3.Future<List<_i4.Post>>.value(<_i4.Post>[]),
           )
           as _i3.Future<List<_i4.Post>>);

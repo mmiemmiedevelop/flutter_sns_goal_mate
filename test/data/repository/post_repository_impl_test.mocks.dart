@@ -84,6 +84,15 @@ class MockPostDataSource extends _i1.Mock implements _i3.PostDataSource {
             returnValueForMissingStub: _i4.Future<void>.value(),
           )
           as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> addPost(String? postId, Map<String, dynamic>? data) =>
+      (super.noSuchMethod(
+            Invocation.method(#addPost, [postId, data]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
 }
 
 /// A class which mocks [QuerySnapshot].

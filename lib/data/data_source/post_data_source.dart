@@ -9,14 +9,6 @@ abstract class PostDataSource {
   Future<void> toggleLike(String postId, String userId);
   // 게시물을 삭제하는 기능
   Future<void> deletePost(String postId);
-  //게시글 등록하는 기능
-  //유저정보 uid
-  //게시글 정보들 : tag,content,List<dynamic> imgurl, createdAt,
-  Future<void> addPost(
-    String uid,
-    List<dynamic> tag,
-    String content,
-    List<dynamic> imgurl,
-    DateTime? createdAt,
-  );
+  // 게시물을 추가하는 기능
+  Future<void> addPost(String postId, Map<String, dynamic> data);
 }

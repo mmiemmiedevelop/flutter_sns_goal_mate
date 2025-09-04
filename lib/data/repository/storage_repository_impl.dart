@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_princess/domain/repository/storage_repository.dart';
 
 class StorageRepositoryImpl implements StorageRepository {
@@ -7,20 +7,22 @@ class StorageRepositoryImpl implements StorageRepository {
 
   final FirebaseStorage _storage;
 
-
-
   @override
-  Future<String> uploadImage(File image, String path) {
-    final ref = _storage.ref()
+  Future<List<String>> uploadImages(List<File> images, String path) async {
+    final futures = images.asMap().entries.map((entry) async {
+      final index = entry.key;
+      final imageFile = entry.value;
+
+      final fileName =
+          '${index}_${DateTime.now().millisecondsSinceEpoch}_${imageFile.path.split('/').last}';
+      final ref = _storage.ref('$path/$fileName');
+
+      final bytes = await imageFile.readAsBytes();
+      final uploadTask = await ref.putData(bytes);
+
+      return await uploadTask.ref.getDownloadURL();
+    }).toList();
+
+    return await Future.wait(futures);
   }
-
-
- 
- 
-//   final ref = FirebaseStorage.instance.ref('users/${user.uid}/profile.jpg');
-//       final imgbyte = await imgUrl!.readAsBytes();
-//       final putData = await ref.putData(imgbyte);
-//       final String profileImgUrl = await putData.ref.getDownloadURL();
-
-
 }
