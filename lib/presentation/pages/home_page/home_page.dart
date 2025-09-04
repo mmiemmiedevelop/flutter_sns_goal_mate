@@ -8,7 +8,6 @@ import 'package:flutter_princess/presentation/common_widget/theme/theme.dart';
 import 'package:flutter_princess/presentation/common_widget/util/error_dialogs.dart';
 import 'package:flutter_princess/presentation/common_widget/util/formatters.dart';
 import 'package:flutter_princess/presentation/pages/home_page/home_page_view_model.dart';
-import 'package:flutter_princess/presentation/pages/provider/home_provider.dart';
 import 'package:flutter_princess/presentation/pages/user_view_model/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,19 +19,31 @@ class HomePage extends ConsumerStatefulWidget {
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class _HomePageState extends ConsumerState<HomePage>
+    with WidgetsBindingObserver {
   late PageController pageController;
 
   @override
   void initState() {
     super.initState();
     pageController = PageController();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     pageController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // 앱이 다시 포그라운드로 돌아왔을 때 데이터 새로고침 및 댓글 수 동기화
+      ref.read(homePageViewModelProvider.notifier).refresh();
+      ref.read(homePageViewModelProvider.notifier).syncAllPostsCommentCount();
+    }
   }
 
   @override
@@ -82,22 +93,6 @@ class _PostItemState extends ConsumerState<PostItem> {
   // 본문 더보기/접기 상태
   bool _isExpanded = false;
 
-  // 프로필 이미지 받는 로직
-  ImageProvider _getImageProvider(String url) {
-    // Uri.tryParse() : 주어진 문자열(url)이 유효한 URI 형식인지 분석해줌
-    final uri = Uri.tryParse(url);
-
-    //   분석 결과가 성공(null이 아님)했고,
-    //    'scheme' (http, https 등)과 '며쇄갸쇼' (google.com 등)가 모두 존재하는지 확인
-    if (uri != null && uri.hasScheme && uri.hasAuthority) {
-      // 모든 조건을 만족하면, 이것은 유효한 인터넷 주소로 가져오기
-      return CachedNetworkImageProvider(url);
-    } else {
-      // 형식이 맞지 않으면, 로컬 asset 파일로 가져오기
-      return AssetImage(url);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     // User ID
@@ -110,8 +105,7 @@ class _PostItemState extends ConsumerState<PostItem> {
     // print('userState.nickname: ${userState.userNickname}');
     final currentUserId = userState.uid;
 
-    // final isMyPost = widget.post.userId == currentUserId;
-    final isMyPost = true; // UI 테스트를 위해 항상 true로 고정
+    final isMyPost = widget.post.userId == currentUserId;
 
     // 좋아요 여부 서버에서 받아서 체크
     final bool isLiked = widget.post.likedBy.contains(currentUserId);
@@ -136,14 +130,58 @@ class _PostItemState extends ConsumerState<PostItem> {
 
   // 1. 배경 이미지 PageView
   Widget _buildBackgroundImage() {
+    // 이미지 URL이 없는 경우 기본 이미지 표시
+    if (widget.post.imageUrls.isEmpty) {
+      return Container(
+        color: Colors.grey[300],
+        child: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.image, size: 100, color: Colors.grey),
+              SizedBox(height: 8),
+              Text('이미지가 없습니다', style: TextStyle(color: Colors.grey)),
+            ],
+          ),
+        ),
+      );
+    }
+
     return PageView.builder(
       itemCount: widget.post.imageUrls.length,
       itemBuilder: (context, imageIndex) {
+        final imageUrl = widget.post.imageUrls[imageIndex];
+
+        // URL이 비어있거나 유효하지 않은 경우 기본 이미지 표시
+        if (imageUrl.isEmpty || !imageUrl.startsWith('http')) {
+          return Container(
+            color: Colors.grey[300],
+            child: const Center(
+              child: Icon(Icons.image, size: 100, color: Colors.grey),
+            ),
+          );
+        }
+
         return CachedNetworkImage(
-          imageUrl: widget.post.imageUrls[imageIndex],
+          imageUrl: imageUrl,
           fit: BoxFit.cover,
-          placeholder: (context, url) => Container(color: Colors.grey[300]),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
+          placeholder: (context, url) => Container(
+            color: Colors.grey[300],
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+          errorWidget: (context, url, error) => Container(
+            color: Colors.grey[300],
+            child: const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error, size: 50, color: Colors.grey),
+                  SizedBox(height: 8),
+                  Text('이미지를 불러올 수 없습니다', style: TextStyle(color: Colors.grey)),
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
@@ -174,11 +212,11 @@ class _PostItemState extends ConsumerState<PostItem> {
                 ),
               ),
 
-              if (isMyPost)
-                IconButton(
-                  icon: const Icon(Icons.settings, color: GoalMateTheme.black),
-                  onPressed: () => context.go('/setting', extra: userState),
-                ),
+              // if (isMyPost)
+              IconButton(
+                icon: const Icon(Icons.settings, color: GoalMateTheme.black),
+                onPressed: () => context.go('/setting', extra: userState),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -186,10 +224,53 @@ class _PostItemState extends ConsumerState<PostItem> {
           // 프로필, 닉네임, 작성 시간
           Row(
             children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundImage: _getImageProvider(
-                  widget.post.userProfileImageUrl,
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey[300],
+                ),
+                child: ClipOval(
+                  child:
+                      widget.post.userProfileImageUrl.isEmpty ||
+                          !widget.post.userProfileImageUrl.startsWith('http')
+                      ? Image.asset(
+                          'assets/img/default_profile.jpg',
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey[300],
+                              child: const Icon(
+                                Icons.person,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        )
+                      : CachedNetworkImage(
+                          imageUrl: widget.post.userProfileImageUrl,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.person, color: Colors.grey),
+                          ),
+                          errorWidget: (context, url, error) {
+                            return Image.asset(
+                              'assets/img/default_profile.jpg',
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Colors.grey[300],
+                                  child: const Icon(
+                                    Icons.person,
+                                    color: Colors.grey,
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
                 ),
               ),
               const SizedBox(width: 12),

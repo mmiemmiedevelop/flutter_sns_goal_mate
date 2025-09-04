@@ -28,11 +28,44 @@ class PostRepositoryImpl implements PostRepository {
       _lastDocument = snapshot.docs.last;
     }
 
-    // 가져온 snapshot(데이터 묶음)을 entity로 변환
-    return snapshot.docs.map((doc) {
+    // 가져온 snapshot(데이터 묶음)을 entity로 변환하고 실제 댓글 수 계산
+    final posts = <Post>[];
+    for (final doc in snapshot.docs) {
       final data = doc.data() as Map<String, dynamic>;
-      return Post.fromFirestore(data, doc.id);
-    }).toList();
+
+      // 실제 댓글 수를 Firebase에서 계산
+      final actualCommentCount = await _dataSource.getActualCommentCount(
+        doc.id,
+      );
+
+      // 데이터에 실제 댓글 수 반영
+      final updatedData = Map<String, dynamic>.from(data);
+      updatedData['commentCount'] = actualCommentCount;
+
+      posts.add(Post.fromFirestore(updatedData, doc.id));
+    }
+
+    return posts;
+  }
+
+  @override
+  Future<Post?> getPostById(String postId) async {
+    final snapshot = await _dataSource.getPostById(postId);
+    if (snapshot.exists && snapshot.data() != null) {
+      final data = snapshot.data() as Map<String, dynamic>;
+
+      // 실제 댓글 수를 Firebase에서 계산
+      final actualCommentCount = await _dataSource.getActualCommentCount(
+        postId,
+      );
+
+      // 데이터에 실제 댓글 수 반영
+      final updatedData = Map<String, dynamic>.from(data);
+      updatedData['commentCount'] = actualCommentCount;
+
+      return Post.fromFirestore(updatedData, snapshot.id);
+    }
+    return null;
   }
 
   @override

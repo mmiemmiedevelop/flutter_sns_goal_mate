@@ -161,7 +161,7 @@ class User {
 // Firestore를 활용한 실시간 데이터 스트림
 Stream<List<Post>> watchPosts() {
   return _firestore
-    .collection('posts')
+    .collection('post')
     .orderBy('createdAt', descending: true)
     .snapshots()
     .map((snapshot) => snapshot.docs
