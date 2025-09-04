@@ -72,7 +72,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
 
   Future<void> _saveProfile() async {
     if (!_isChanged) {
-      context.pop();
+      context.go('/home');
       return; // 변경사항 없을 시 그냥 나가기
     }
     setState(() => _isUploading = true);
@@ -92,7 +92,7 @@ class _SettingPageState extends ConsumerState<SettingPage> {
 
     if (mounted) {
       if (success) {
-        context.pop();
+        context.go('/home');
       } else {
         ScaffoldMessenger.of(
           context,

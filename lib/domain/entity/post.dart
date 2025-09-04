@@ -26,7 +26,62 @@ class Post {
     required this.likeCount,
     required this.commentCount,
     required this.likedBy,
-  });
+  }); // likedBy 필드를 안전하게 파싱하는 헬퍼 메서드
+  static List<String> _parseLikedBy(dynamic likedByData) {
+    if (likedByData == null) {
+      return [];
+    }
+
+    // 이미 리스트인 경우
+    if (likedByData is List) {
+      return List<String>.from(likedByData);
+    }
+
+    // 문자열인 경우 (잘못된 데이터 형식)
+    if (likedByData is String) {
+      // 빈 문자열이면 빈 리스트 반환
+      if (likedByData.isEmpty) {
+        return [];
+      }
+      // 콤마로 구분된 문자열이라고 가정하고 분리 (또는 단일 항목으로 처리)
+      if (likedByData.contains(',')) {
+        return likedByData.split(',').map((e) => e.trim()).toList();
+      } else {
+        return [likedByData];
+      }
+    }
+
+    // 다른 타입인 경우 빈 리스트 반환
+    return [];
+  }
+
+  // 문자열 리스트 필드를 안전하게 파싱하는 헬퍼 메서드 (imageUrls, tags 등)
+  static List<String> _parseStringList(dynamic listData) {
+    if (listData == null) {
+      return [];
+    }
+
+    // 이미 리스트인 경우
+    if (listData is List) {
+      return List<String>.from(listData);
+    }
+
+    // 문자열인 경우
+    if (listData is String) {
+      if (listData.isEmpty) {
+        return [];
+      }
+      // 콤마로 구분된 문자열이라고 가정하고 분리
+      if (listData.contains(',')) {
+        return listData.split(',').map((e) => e.trim()).toList();
+      } else {
+        return [listData];
+      }
+    }
+
+    // 다른 타입인 경우 빈 리스트 반환
+    return [];
+  }
 
   // Firestore의 Map 데이터와 문서 ID를 받아 Post 객체로 변환하는 팩토리 생성자
   factory Post.fromFirestore(Map<String, dynamic> data, String documentId) {
@@ -39,13 +94,13 @@ class Post {
       userProfileImageUrl: (imageUrlFromDb == null || imageUrlFromDb.isEmpty)
           ? 'assets/img/default_profile.jpg'
           : imageUrlFromDb,
-      imageUrls: List<String>.from(data['imageUrls'] ?? []),
+      imageUrls: _parseStringList(data['imageUrls']),
       content: data['content'] ?? '',
-      tags: List<String>.from(data['tags'] ?? []),
+      tags: _parseStringList(data['tags']),
       likeCount: data['likeCount'] ?? 0,
       commentCount: data['commentCount'] ?? 0,
       createdAt: (data['createdAt'] as Timestamp? ?? Timestamp.now()).toDate(),
-      likedBy: List<String>.from(data['likedBy'] ?? []),
+      likedBy: _parseLikedBy(data['likedBy']),
     );
   }
 
