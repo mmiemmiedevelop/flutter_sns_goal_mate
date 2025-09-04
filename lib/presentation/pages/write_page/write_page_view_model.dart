@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter_princess/domain/usecase/add_post_usecase.dart';
+import 'package:flutter_princess/domain/usecase/upload_images_usecase.dart';
 import 'package:flutter_princess/presentation/pages/home_page/home_page_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_princess/domain/entity/post.dart';
@@ -65,7 +66,7 @@ class WritePageViewModel extends StateNotifier<WritePageState> {
   // 게시글 업로드
   Future<void> addPost(Post post) async {
     await _addPostUseCase.execute(post);
-
-    _homePageViewModel.refresh();
+    // TODO : 확인해야함
+    // _homePageViewModel.refresh();
   }
 }

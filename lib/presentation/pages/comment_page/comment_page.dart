@@ -4,7 +4,7 @@ import 'package:flutter_princess/domain/entity/comment.dart';
 import 'package:flutter_princess/presentation/common_widget/util/formatters.dart';
 import 'package:flutter_princess/presentation/pages/comment_page/comment_page_view_model.dart';
 import 'package:flutter_princess/presentation/pages/provider/comment_provider.dart';
-import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
+import 'package:flutter_princess/presentation/pages/user_view_model/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CommentPage extends ConsumerStatefulWidget {

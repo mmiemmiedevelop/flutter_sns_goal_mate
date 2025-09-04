@@ -40,4 +40,23 @@ class UserRepositoryImpl implements UserRepository {
       profileImgUrl: source.profileImgUrl,
     );
   }
+
+  @override
+  Future<User> editProfile(
+    String uid, {
+    String? profileImgUrl,
+    String? newUserNickname,
+  }) async {
+    final source = await userDataSource.editProfile(
+      uid,
+      profileImgUrl: profileImgUrl,
+      newUserNickname: newUserNickname,
+    );
+    return User(
+      uid: source.uid,
+      email: source.email,
+      userNickname: source.userNickname,
+      profileImgUrl: source.profileImgUrl,
+    );
+  }
 }

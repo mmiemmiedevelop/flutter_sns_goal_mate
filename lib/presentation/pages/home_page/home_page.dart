@@ -7,8 +7,9 @@ import 'package:flutter_princess/domain/entity/post.dart';
 import 'package:flutter_princess/presentation/common_widget/theme/theme.dart';
 import 'package:flutter_princess/presentation/common_widget/util/error_dialogs.dart';
 import 'package:flutter_princess/presentation/common_widget/util/formatters.dart';
+import 'package:flutter_princess/presentation/pages/home_page/home_page_view_model.dart';
 import 'package:flutter_princess/presentation/pages/provider/home_provider.dart';
-import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
+import 'package:flutter_princess/presentation/pages/user_view_model/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
