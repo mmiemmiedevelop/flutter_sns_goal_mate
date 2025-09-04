@@ -2,7 +2,7 @@ import 'package:flutter_princess/domain/entity/post.dart';
 import 'package:flutter_princess/domain/usecase/delete_post_usecase.dart';
 import 'package:flutter_princess/domain/usecase/fetch_posts_usecase.dart';
 import 'package:flutter_princess/domain/usecase/toggle_like_usecase.dart';
-import 'package:flutter_princess/presentation/pages/home_page/home_provider.dart';
+import 'package:flutter_princess/presentation/pages/provider/home_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final homePageViewModelProvider =

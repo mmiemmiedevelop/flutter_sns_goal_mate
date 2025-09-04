@@ -2,7 +2,7 @@
 
 import 'package:flutter_princess/domain/entity/comment.dart';
 import 'package:flutter_princess/domain/usecase/fetch_comment_usecase.dart';
-import 'package:flutter_princess/presentation/pages/comment_page/comment_provider.dart';
+import 'package:flutter_princess/presentation/pages/provider/comment_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 

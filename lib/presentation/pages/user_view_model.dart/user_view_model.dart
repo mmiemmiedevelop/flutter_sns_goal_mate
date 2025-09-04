@@ -1,11 +1,8 @@
 //signup
 
 import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter_princess/presentation/common_widget/util/get_Img_url.dart';
+import 'package:flutter_princess/presentation/common_widget/util/get_img_url.dart';
 import 'package:flutter_princess/presentation/pages/provider/user_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -51,11 +48,14 @@ class UserViewModel extends Notifier<UserState?> {
       if (user == null) return false;
 
       //이미지 -> url변환 전처리
-      final ref = FirebaseStorage.instance.ref('users/${user.uid}/profile.jpg');
-      final imgbyte = await imgUrl!.readAsBytes();
-      final putData = await ref.putData(imgbyte);
-      final String profileImgUrl = await putData.ref.getDownloadURL();
-
+      // final ref = FirebaseStorage.instance.ref('users/${user.uid}/profile.jpg');
+      // final imgbyte = await imgUrl!.readAsBytes();
+      // final putData = await ref.putData(imgbyte);
+      // final String profileImgUrl = await putData.ref.getDownloadURL();
+      final profileImgUrl = await getImgUrl(
+        imageFile: imgUrl,
+        path: '${user.uid}/profile.jpg',
+      );
       editProfile(user.uid, userNickname, profileImgUrl);
       return login(email, password);
     } catch (e) {

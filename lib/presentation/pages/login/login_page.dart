@@ -51,6 +51,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (_formKey.currentState!.validate()) {
       final email = _email.text.trim();
       final password = _password.text;
+
       final ok = await vm.login(email, password);
       if (!mounted) return;
       if (ok) {
@@ -70,104 +71,99 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
-    return Scaffold(
-      body: SafeArea(
-        child: Container(
-          padding: EdgeInsets.only(top: width * 0.3),
-          width: double.infinity,
-          child: ListView(
-            padding: EdgeInsets.symmetric(horizontal: 26),
+    return Stack(
+      children: [
+        Scaffold(
+          body: SafeArea(
+            child: Container(
+              padding: EdgeInsets.only(top: width * 0.3),
+              width: double.infinity,
+              child: ListView(
+                padding: EdgeInsets.symmetric(horizontal: 26),
 
-            children: [
-              //logos 이미지
-              Column(
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset('assets/img/logos.png'),
-                  Text('당신의 목표, 함께 달성해요.'),
-                ],
-              ),
-              SizedBox(height: 50),
-              //로그인폼
-              Container(
-                child: Form(
-                  key: _formKey,
-                  child: Column(
+                  //logos 이미지
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      TextFormField(
-                        controller: _email,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next, //엔터누르면 다름필드로
-                        decoration: InputDecoration(hintText: '이메일을 입력해주세요')
-                            .copyWith(
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                            ),
-                        validator: _validateEmail,
-                      ),
-                      SizedBox(height: 15),
-                      TextFormField(
-                        controller: _password,
-                        obscureText: true,
-                        textInputAction:
-                            TextInputAction.done, //엔터누르면 완료 ->onFieldSubmitted
-                        decoration: InputDecoration(hintText: '비밀번호를 입력해주세요')
-                            .copyWith(
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey),
-                              ),
-                            ),
-                        validator: _validatePassword,
-                        onFieldSubmitted: (_) => _submit(),
-                      ),
-                      SizedBox(height: 50),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _submit,
-                          child: const Text('로그인'),
-                        ),
-                      ),
-                      SizedBox(height: 15),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 55,
-                        child: GestureDetector(
-                          onTap: () {
-                            //TOdo 구글로그인
-                            print('구글');
-                          },
-                          child: Image.asset(
-                            'assets/img/googleAuth.png',
-                            fit: BoxFit.fitWidth,
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 25),
-                      TextButton(
-                        onPressed: () {
-                          context.pushNamed('signup');
-                        },
-                        child: Text('회원가입'),
-                      ),
+                      Image.asset('assets/img/logos.png'),
+                      Text('당신의 목표, 함께 달성해요.'),
                     ],
                   ),
-                ),
-              ),
+                  SizedBox(height: 50),
+                  //로그인폼
+                  Container(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: _email,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next, //엔터누르면 다름필드로
+                            decoration: InputDecoration(hintText: '이메일을 입력해주세요')
+                                .copyWith(
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.grey),
+                                  ),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.grey),
+                                  ),
+                                ),
+                            validator: _validateEmail,
+                          ),
+                          SizedBox(height: 15),
+                          TextFormField(
+                            controller: _password,
+                            obscureText: true,
+                            textInputAction: TextInputAction
+                                .done, //엔터누르면 완료 ->onFieldSubmitted
+                            decoration:
+                                InputDecoration(
+                                  hintText: '비밀번호를 입력해주세요',
+                                ).copyWith(
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.grey),
+                                  ),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.grey),
+                                  ),
+                                ),
+                            validator: _validatePassword,
+                            onFieldSubmitted: (_) => _submit(),
+                          ),
+                          SizedBox(height: 50),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _submit,
+                              child: const Text('로그인'),
+                            ),
+                          ),
+                          SizedBox(height: 25),
+                          TextButton(
+                            onPressed: () {
+                              context.pushNamed('signup');
+                            },
+                            child: Text('회원가입'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
 
-              //
-            ],
+                  //
+                ],
+              ),
+            ),
           ),
         ),
-      ),
+        if (_loading)
+          const IgnorePointer(
+            ignoring: true,
+            child: Center(child: CircularProgressIndicator()),
+          ),
+      ],
     );
   }
 }
