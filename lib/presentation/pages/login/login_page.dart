@@ -15,7 +15,6 @@ class LoginPage extends ConsumerStatefulWidget {
 class _LoginPageState extends ConsumerState<LoginPage> {
   UserViewModel get vm => ref.read(userStateViewmodelProvider.notifier);
   bool _loading = false;
-  bool _loading = false;
   //텍스트폼유효성검사
   final _formKey = GlobalKey<FormState>();
   //로그인폼텍스트컨트롤러 선언
@@ -54,15 +53,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (_formKey.currentState!.validate()) {
       final email = _email.text.trim();
       final password = _password.text;
-
       final ok = await vm.login(email, password);
       if (!mounted) return;
       if (ok) {
         context.pushNamed('home');
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('아이디,비밀번호가 틀렸습니다.')));
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('아이디,비밀번호가 틀렸습니다.')));
