@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 /// 로그인 페이지
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
+
   @override
   ConsumerState<LoginPage> createState() => _LoginPageState();
 }
@@ -17,9 +18,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   bool _loading = false;
   //텍스트폼유효성검사
   final _formKey = GlobalKey<FormState>();
+
   //로그인폼텍스트컨트롤러 선언
   late final TextEditingController _email;
   late final TextEditingController _password;
+
   @override
   void initState() {
     super.initState();
@@ -53,6 +56,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (_formKey.currentState!.validate()) {
       final email = _email.text.trim();
       final password = _password.text;
+
       final ok = await vm.login(email, password);
       if (!mounted) return;
       if (ok) {
@@ -65,9 +69,36 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
-  // Future<void> _google() async {
-  //   final gogo = await vm.googleLogin();
-  // }
+  Future<void> _google() async {
+    setState(() {
+      _loading = true;
+    });
+
+    try {
+      await vm.googleLogin();
+      if (!mounted) return;
+
+      if (FirebaseAuth.instance.currentUser != null) {
+        context.pushNamed('home');
+        print('Google 로그인 성공');
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Google 로그인에 실패했습니다.')));
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Google 로그인 오류: $e')));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +178,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           GestureDetector(
                             onTap: () {
                               print('Google login');
-                              // _google();
+                              _google();
                             },
                             child: Container(
                               width: double.infinity,

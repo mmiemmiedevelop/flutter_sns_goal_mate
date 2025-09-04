@@ -11,4 +11,9 @@ class FetchPostsUseCase {
 
     return _repository.fetchPosts();
   }
+
+  // repositoy의 reset 여기서 호출
+  void reset() {
+    _repository.reset();
+  }
 }

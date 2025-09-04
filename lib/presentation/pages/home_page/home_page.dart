@@ -23,19 +23,22 @@ class HomePage extends ConsumerWidget {
 
     return Scaffold(
       // PageView.builder를 사용하여 틱톡처럼 위아래로 스크롤되는 피드를 만듬
-      body: PageView.builder(
-        controller: pageController,
-        scrollDirection: Axis.vertical, // 스크롤 방향을 수직으로 설정
-        itemCount: posts.length,
-        // 무한 스크롤: 페이지가 거의 끝에 도달했을 때 다음 데이터를 불러오기
-        onPageChanged: (index) {
-          if (index == posts.length - 2) {
-            ref.read(homePageViewModelProvider.notifier).fetchNextPage();
-          }
-        },
-        itemBuilder: (context, index) {
-          return PostItem(post: posts[index]);
-        },
+      body: RefreshIndicator(
+        onRefresh: () => ref.read(homePageViewModelProvider.notifier).refresh(),
+        child: PageView.builder(
+          controller: pageController,
+          scrollDirection: Axis.vertical, // 스크롤 방향을 수직으로 설정
+          itemCount: posts.length,
+          // 무한 스크롤: 페이지가 거의 끝에 도달했을 때 다음 데이터를 불러오기
+          onPageChanged: (index) {
+            if (index == posts.length - 2) {
+              ref.read(homePageViewModelProvider.notifier).fetchNextPage();
+            }
+          },
+          itemBuilder: (context, index) {
+            return PostItem(post: posts[index]);
+          },
+        ),
       ),
     );
   }

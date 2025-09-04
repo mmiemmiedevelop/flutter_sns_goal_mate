@@ -10,7 +10,6 @@ import 'package:flutter_princess/domain/usecase/edit_profile_usercase.dart';
 import 'package:flutter_princess/domain/usecase/email_login_usecase.dart';
 import 'package:flutter_princess/domain/usecase/email_signup_usecase.dart';
 import 'package:flutter_princess/domain/usecase/fetch_user_usecase.dart';
-import 'package:flutter_princess/domain/usecase/google_login_usecase.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 //user
@@ -54,5 +53,5 @@ final emailLoginUsecaseProvider = Provider((ref) {
 
 final googleLoginUsecaseProvider = Provider((ref) {
   final authRepository = ref.read(_authRepositoryProvider);
-  return GoogleLoginUsecaseImpl(authRepository);
+  return GoogleLoginUsecase(authRepository);
 });
