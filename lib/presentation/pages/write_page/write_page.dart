@@ -1,6 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_princess/presentation/common_widget/theme/theme.dart';
+import 'package:flutter_princess/presentation/pages/provider/write_page_provider.dart';
+import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'write_page_view_model.dart';
 import '../../../domain/entity/post.dart';
@@ -33,20 +37,20 @@ class _WritePageState extends ConsumerState<WritePage> {
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     try {
-      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-      if (image == null) return;
-      final file = File(image.path);
-      if (!file.existsSync()) return;
+      final List<XFile> images = await picker.pickMultiImage();
+      if (images.isEmpty) return;
 
-      ref.read(writePageViewModelProvider.notifier).selectImage(file);
+      final files = images.map((image) => File(image.path)).toList();
+
+      ref.read(writePageViewModelProvider.notifier).selectImages(files);
     } catch (e) {
       print('이미지 선택 오류: $e');
     }
   }
 
   Future<bool> _showExitDialog() async {
-    final selectedImage = ref.read(writePageViewModelProvider).selectedImage;
-    if (selectedImage != null ||
+    final selectedImages = ref.read(writePageViewModelProvider).selectedImages;
+    if (selectedImages.isNotEmpty ||
         _tagController.text.isNotEmpty ||
         _contentController.text.isNotEmpty) {
       return (await showDialog<bool>(
@@ -55,11 +59,11 @@ class _WritePageState extends ConsumerState<WritePage> {
               content: const Text('나가시면 작성하신 게 지워져요'),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
+                  onPressed: () => context.pop(false),
                   child: const Text('취소'),
                 ),
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
+                  onPressed: () => context.pop(true),
                   child: const Text('나가기'),
                 ),
               ],
@@ -70,11 +74,76 @@ class _WritePageState extends ConsumerState<WritePage> {
     return true;
   }
 
+  Widget _buildImagePreview() {
+    final state = ref.watch(writePageViewModelProvider);
+    final vm = ref.read(writePageViewModelProvider.notifier);
+
+    //이미지 선택 안했을 때
+    if (state.selectedImages.isEmpty) {
+      return GestureDetector(
+        onTap: _pickImage,
+        child: Container(
+          height: 350,
+          decoration: BoxDecoration(
+            color: GoalMateTheme.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Center(
+            child: Icon(Icons.image, size: 80, color: Colors.grey[600]),
+          ),
+        ),
+      );
+    }
+    // 이미지 선택 됐을 때 PageView
+    return Container(
+      height: 350,
+      decoration: BoxDecoration(
+        color: GoalMateTheme.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: PageView.builder(
+        itemCount: state.selectedImages.length,
+        itemBuilder: (context, index) {
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.file(
+                  state.selectedImages[index],
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: CircleAvatar(
+                  backgroundColor: Colors.black54,
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.close,
+                      color: GoalMateTheme.black,
+                      size: 20,
+                    ),
+                    onPressed: () => vm.removeImage(index),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(writePageViewModelProvider);
     final vm = ref.read(writePageViewModelProvider.notifier);
-
+    final userState = ref.watch(userStateViewmodelProvider);
+    if (userState == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -83,7 +152,7 @@ class _WritePageState extends ConsumerState<WritePage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () async {
-            if (await _showExitDialog()) Navigator.pop(context);
+            if (await _showExitDialog()) context.pop();
           },
         ),
         title: const Text(
@@ -102,38 +171,20 @@ class _WritePageState extends ConsumerState<WritePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 60),
-            GestureDetector(
-              onTap: _pickImage,
-              child: Container(
-                height: 350,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE5E5EA),
-                  borderRadius: BorderRadius.circular(10),
-                  image: state.selectedImage != null
-                      ? DecorationImage(
-                          image: FileImage(state.selectedImage!),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
-                ),
-                child: state.selectedImage == null
-                    ? Center(
-                        child: Icon(
-                          Icons.image,
-                          size: 80,
-                          color: Colors.grey[600],
-                        ),
-                      )
-                    : null,
+            _buildImagePreview(),
+            if (state.selectedImages.isNotEmpty)
+              TextButton.icon(
+                onPressed: _pickImage,
+                icon: Icon(Icons.add_a_photo),
+                label: Text("사진 추가"),
               ),
-            ),
             const SizedBox(height: 30),
             TextField(
               controller: _tagController,
               style: const TextStyle(color: Colors.black, fontSize: 17),
               cursorColor: Colors.deepPurple,
               decoration: InputDecoration(
-                hintText: '#태그',
+                hintText: '#태그1 #태그2 #태그3',
                 hintStyle: TextStyle(color: Colors.grey[600]),
                 border: InputBorder.none,
                 isDense: true,
@@ -163,25 +214,38 @@ class _WritePageState extends ConsumerState<WritePage> {
               onPressed: state.isUploading
                   ? null
                   : () async {
-                      if (_contentController.text.isEmpty) return;
+                      if (_contentController.text.isEmpty ||
+                          state.selectedImages.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('이미지와 내용을 모두 입력해주세요!')),
+                        );
+                        return;
+                      }
 
                       vm.setUploading(true);
 
-                      String? imageUrl;
-                      if (state.selectedImage != null) {
-                        imageUrl = await vm.uploadImage(state.selectedImage!);
+                      List<String> imageUrls = await vm.uploadImages(
+                        state.selectedImages,
+                      );
+
+                      if (imageUrls.isEmpty) {
+                        vm.setUploading(false);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('이미지 업로드에 실패하였습니다.')),
+                        );
+                        return;
                       }
 
                       final newPost = Post(
                         id: DateTime.now().millisecondsSinceEpoch.toString(),
-                        userId: 'sorin_dev',
-                        userNickname: '정소린',
-                        userProfileImageUrl:
-                            'https://placehold.co/100x100/F27272/FFFFFF?text=SR',
-                        imageUrls: imageUrl != null ? [imageUrl] : [],
-                        tags: _tagController.text.isNotEmpty
-                            ? [_tagController.text]
-                            : [],
+                        userId: userState.uid,
+                        userNickname: userState.userNickname,
+                        userProfileImageUrl: userState.profileImgUrl,
+                        imageUrls: imageUrls,
+                        tags: _tagController.text
+                            .split(' ') // 띄어쓰기로 구분!
+                            .where((tag) => tag.startsWith('#'))
+                            .toList(),
                         content: _contentController.text,
                         createdAt: DateTime.now(),
                         likeCount: 0,
@@ -192,8 +256,9 @@ class _WritePageState extends ConsumerState<WritePage> {
                       await vm.addPost(newPost);
                       vm.setUploading(false);
 
-                      Navigator.pop(context);
+                      if (mounted) context.pop();
                     },
+
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF613EEA),
                 minimumSize: const Size(double.infinity, 50),

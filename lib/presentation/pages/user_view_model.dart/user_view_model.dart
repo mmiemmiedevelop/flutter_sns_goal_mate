@@ -53,7 +53,11 @@ class UserViewModel extends Notifier<UserState?> {
       // final imgbyte = await imgUrl!.readAsBytes();
       // final putData = await ref.putData(imgbyte);
       // final String profileImgUrl = await putData.ref.getDownloadURL();
+
+      final profileImgUrl = getImgUrl(
+
       final profileImgUrl = await getImgUrl(
+
         imageFile: imgUrl,
         path: '${user.uid}/profile.jpg',
       );
