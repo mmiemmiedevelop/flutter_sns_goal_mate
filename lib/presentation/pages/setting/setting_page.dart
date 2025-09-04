@@ -1,7 +1,9 @@
 // lib/setting/setting_page.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_princess/presentation/common_widget/theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'setting_page_view_model.dart';
 
@@ -92,7 +94,7 @@ class SettingPage extends ConsumerWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.go('/home'),
         ),
         title: const Text(
           '프로필 수정',
@@ -170,10 +172,16 @@ class SettingPage extends ConsumerWidget {
                 ),
               ),
               child: state.isUploading
-                  ? const CircularProgressIndicator(color: Colors.white)
+                  ? const CircularProgressIndicator(
+                      color: GoalMateTheme.white,
+                      strokeWidth: 3.0,
+                    )
                   : const Text(
                       '저장하기',
-                      style: TextStyle(fontSize: 17, color: Colors.white),
+                      style: TextStyle(
+                        fontSize: 17,
+                        color: GoalMateTheme.white,
+                      ),
                     ),
             ),
           ],

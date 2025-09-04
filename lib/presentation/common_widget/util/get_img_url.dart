@@ -33,6 +33,7 @@ Future<String> getImgUrls({
       '${index}_${DateTime.now().millisecondsSinceEpoch}_${imageFile.path.split('/').last}';
   //fireStore에 경로
   final ref = FirebaseStorage.instance.ref('users/$path/$name');
+
   //이미지 전처리
   final bytes = await imageFile.readAsBytes();
   //경로에 이미지 저장
@@ -47,6 +48,7 @@ Future<List<String>> uploadImages({
 }) async {
   //리스트 초기화
   final futures = <Future<String>>[];
+
   for (var i = 0; i < imageFiles.length; i++) {
     //리스트에 추가
     futures.add(getImgUrls(imageFile: imageFiles[i], path: path, index: i));

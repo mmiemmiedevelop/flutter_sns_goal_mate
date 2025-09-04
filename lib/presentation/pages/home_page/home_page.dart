@@ -8,7 +8,8 @@ import 'package:flutter_princess/presentation/common_widget/theme/theme.dart';
 import 'package:flutter_princess/presentation/common_widget/util/error_dialogs.dart';
 import 'package:flutter_princess/presentation/common_widget/util/formatters.dart';
 import 'package:flutter_princess/presentation/pages/home_page/home_page_view_model.dart';
-import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
+import 'package:flutter_princess/presentation/pages/provider/home_provider.dart';
+import 'package:flutter_princess/presentation/pages/user_view_model/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,19 +23,28 @@ class HomePage extends ConsumerWidget {
 
     return Scaffold(
       // PageView.builder를 사용하여 틱톡처럼 위아래로 스크롤되는 피드를 만듬
-      body: PageView.builder(
-        controller: pageController,
-        scrollDirection: Axis.vertical, // 스크롤 방향을 수직으로 설정
-        itemCount: posts.length,
-        // 무한 스크롤: 페이지가 거의 끝에 도달했을 때 다음 데이터를 불러오기
-        onPageChanged: (index) {
-          if (index == posts.length - 2) {
-            ref.read(homePageViewModelProvider.notifier).fetchNextPage();
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await ref.read(homePageViewModelProvider.notifier).refresh();
+          // 리프레시가 완료되면 PageController를 첫 페이지(인덱스 0)로 이동
+          if (context.mounted) {
+            pageController.jumpToPage(0);
           }
         },
-        itemBuilder: (context, index) {
-          return PostItem(post: posts[index]);
-        },
+        child: PageView.builder(
+          controller: pageController,
+          scrollDirection: Axis.vertical, // 스크롤 방향을 수직으로 설정
+          itemCount: posts.length,
+          // 무한 스크롤: 페이지가 거의 끝에 도달했을 때 다음 데이터를 불러오기
+          onPageChanged: (index) {
+            if (index == posts.length - 2) {
+              ref.read(homePageViewModelProvider.notifier).fetchNextPage();
+            }
+          },
+          itemBuilder: (context, index) {
+            return PostItem(post: posts[index]);
+          },
+        ),
       ),
     );
   }
@@ -77,6 +87,9 @@ class _PostItemState extends ConsumerState<PostItem> {
     if (userState == null) {
       return const Center(child: CircularProgressIndicator());
     }
+    // print('userState.email: ${userState.email}');
+    // print('userState.uid: ${userState.uid}');
+    // print('userState.nickname: ${userState.userNickname}');
     final currentUserId = userState.uid;
 
     final isMyPost = widget.post.userId == currentUserId;
@@ -204,7 +217,7 @@ class _PostItemState extends ConsumerState<PostItem> {
             child: Material(
               color: GoalMateTheme.signatureColor,
               child: InkWell(
-                onTap: () => context.go('/write'),
+                onTap: () => context.push('/write'),
                 child: Container(
                   padding: const EdgeInsets.all(4.0),
                   decoration: BoxDecoration(

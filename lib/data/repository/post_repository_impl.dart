@@ -15,6 +15,11 @@ class PostRepositoryImpl implements PostRepository {
   }
 
   @override
+  Future<void> addPost(Post post) async {
+    return _dataSource.addPost(post.id, post.toJson());
+  }
+
+  @override
   Future<List<Post>> fetchPosts() async {
     // 마지막으로 본거 다음부터 가져오기
     final snapshot = await _dataSource.fetchPosts(lastDocument: _lastDocument);
@@ -33,5 +38,11 @@ class PostRepositoryImpl implements PostRepository {
   @override
   Future<void> toggleLike(String postId, String userId) async {
     return _dataSource.toggleLike(postId, userId);
+  }
+
+  @override
+  void reset() {
+    // 페이지 상태 초기화
+    _lastDocument = null;
   }
 }

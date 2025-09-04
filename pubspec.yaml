@@ -106,10 +106,6 @@ flutter:
       fonts:
         - asset: assets/fonts/NotoSansKR-Medium.ttf
           weight: 500
-    - family: Roboto
-      fonts:
-        - asset: assets\fonts\Roboto-Medium.ttf 
-          weight: 500
 # 이렇게 쓰시면 됩니다>> Text(
 #   '안녕하세요',
 #   style: TextStyle(
