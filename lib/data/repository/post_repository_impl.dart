@@ -14,6 +14,11 @@ class PostRepositoryImpl implements PostRepository {
     return _dataSource.deletePost(postId);
   }
 
+    @override
+  Future<void> addPost(Post post) async {
+    return _dataSource.addPost(post.id, post.toJson());
+  }
+
   @override
   Future<List<Post>> fetchPosts() async {
     // 마지막으로 본거 다음부터 가져오기
@@ -33,5 +38,10 @@ class PostRepositoryImpl implements PostRepository {
   @override
   Future<void> toggleLike(String postId, String userId) async {
     return _dataSource.toggleLike(postId, userId);
+  }
+  
+  @override
+  void reset() {
+    // TODO: implement reset
   }
 }

@@ -10,16 +10,17 @@ import 'package:image_picker/image_picker.dart';
 
 /// 로그인 페이지
 class SignUpNickNamePage extends ConsumerStatefulWidget {
-  final String email;
-  final String password;
-  final File? imageFile;
-
   const SignUpNickNamePage({
     super.key,
     required this.email,
     required this.password,
     this.imageFile,
+    //this.uid,
   });
+  final String email;
+  final String password;
+  final File? imageFile;
+  //final String? uid = null;
 
   @override
   ConsumerState<SignUpNickNamePage> createState() => _SignUpNickNamePageState();
@@ -34,7 +35,9 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
 
   //회원가입폼텍스트컨트롤러 선언
   late final TextEditingController _userNickName;
-  late final TextEditingController _password;
+
+  //로그인로딩 상태
+  bool _loading = false;
 
   @override
   void initState() {
