@@ -132,6 +132,9 @@ class _PostItemState extends ConsumerState<PostItem> {
 
   // 2. 상단 UI
   Widget _buildTopBar(BuildContext context, bool isMyPost) {
+    // Setting page랑 연결하느라 여기서도 가져오도록 추가
+    final userState = ref.watch(userStateViewmodelProvider);
+
     return Positioned(
       top: 50,
       left: 16,
@@ -155,7 +158,7 @@ class _PostItemState extends ConsumerState<PostItem> {
               if (isMyPost)
                 IconButton(
                   icon: const Icon(Icons.settings, color: GoalMateTheme.black),
-                  onPressed: () => context.go('/setting'),
+                  onPressed: () => context.go('/setting', extra: userState),
                 ),
             ],
           ),

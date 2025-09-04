@@ -25,7 +25,7 @@ class UserState {
 
   @override
   String toString() {
-    return 'uid: $uid';
+    return 'uid: $uid, email: $email, profileImgUrl: $profileImgUrl, userNickname: $userNickname';
   }
 }
 
@@ -53,11 +53,16 @@ class UserViewModel extends Notifier<UserState?> {
       // final imgbyte = await imgUrl!.readAsBytes();
       // final putData = await ref.putData(imgbyte);
       // final String profileImgUrl = await putData.ref.getDownloadURL();
-      final profileImgUrl = await getImgUrl(
+      // final profileImgUrl = await getImgUrl(
+      //   imageFile: imgUrl,
+      //   path: '${user.uid}/profile.jpg',
+      // );
+
+      await editProfile(
+        uid: user.uid,
+        userNickname: userNickname,
         imageFile: imgUrl,
-        path: '${user.uid}/profile.jpg',
       );
-      editProfile(user.uid, userNickname, profileImgUrl);
       return login(email, password);
     } catch (e) {
       print(e);
@@ -91,23 +96,45 @@ class UserViewModel extends Notifier<UserState?> {
   }
 
   //edit
-  Future<bool> editProfile(
-    String uid,
+  Future<bool> editProfile({
+    required String uid,
     String? userNickname,
-    String? profileImgUrl,
-  ) async {
+    File? imageFile,
+    String? newProfileImgUrl,
+  }) async {
     final usecase = ref.read(editProfileUsecaseProvider);
+    String? finalProfileImgUrl = newProfileImgUrl;
+
+    if (imageFile != null) {
+      try {
+        final storageRepo = ref.read(storageRepositoryProvider);
+        final urls = await storageRepo.uploadImages([
+          imageFile,
+        ], '$uid/profile');
+        if (urls.isNotEmpty) {
+          finalProfileImgUrl = urls.first;
+        }
+      } catch (e) {
+        print('image upload failed: $e');
+        return false;
+      }
+    }
 
     try {
       final user = await usecase.execute(
         uid,
         newUserNickname: userNickname,
-        profileImgUrl: profileImgUrl,
+        profileImgUrl: finalProfileImgUrl,
       );
+
+      if (user == null) return false;
+
+      final prevImageUrl = state?.profileImgUrl ?? '';
+      final updatedImageUrl = user.profileImgUrl ?? prevImageUrl;
       state = UserState(
-        uid: user!.uid,
+        uid: user.uid,
         email: user.email,
-        profileImgUrl: user.profileImgUrl ?? '',
+        profileImgUrl: updatedImageUrl,
         userNickname: user.userNickname,
       );
       return true;

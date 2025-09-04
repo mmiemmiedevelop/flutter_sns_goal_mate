@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_princess/domain/entity/post.dart';
+import 'package:flutter_princess/domain/entity/user.dart';
 import 'package:flutter_princess/presentation/pages/comment_page/comment_page.dart';
 import 'package:flutter_princess/presentation/pages/home_page/home_page.dart';
 import 'package:flutter_princess/presentation/pages/login/login_page.dart';
@@ -43,7 +44,7 @@ final router = GoRouter(
           password: password,
           imageFile: imageFile,
         );
-      }, // TODO: LoginPage UI 생성 후 연결
+      },
     ),
     GoRoute(
       path: '/home',
@@ -58,7 +59,13 @@ final router = GoRouter(
     GoRoute(
       path: '/setting',
       name: 'setting',
-      builder: (context, state) => SettingPage(),
+      builder: (context, state) {
+        final user = state.extra as User?;
+        if (user == null) {
+          return const Scaffold(body: Center(child: Text("오류: 사용자 정보가 없습니다.")));
+        }
+        return SettingPage(user: user);
+      },
     ),
     GoRoute(
       path: '/comment/:postId',

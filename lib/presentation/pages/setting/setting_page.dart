@@ -1,91 +1,109 @@
-// lib/setting/setting_page.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_princess/domain/entity/user.dart';
 import 'package:flutter_princess/presentation/common_widget/theme/theme.dart';
+import 'package:flutter_princess/presentation/pages/user_view_model/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'setting_page_view_model.dart';
 
-class SettingPage extends ConsumerWidget {
-  const SettingPage({Key? key}) : super(key: key);
+class SettingPage extends ConsumerStatefulWidget {
+  final User user;
+  const SettingPage({Key? key, required this.user}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(settingViewModelProvider);
-    final vm = ref.read(settingViewModelProvider.notifier);
+  ConsumerState<SettingPage> createState() => _SettingPageState();
+}
 
-    final ImageProvider<Object> imageProvider = state.selectedFile != null
-        ? FileImage(state.selectedFile!)
-        : state.selectedUrl != null
-        ? NetworkImage(state.selectedUrl!)
-        : state.currentProfileUrl != null
-        ? NetworkImage(state.currentProfileUrl!)
-        : const NetworkImage(
-            'https://static.cdn.kmong.com/gigs/jYcIZ1753511586.jpg?w=500',
-          );
+class _SettingPageState extends ConsumerState<SettingPage> {
+  late final TextEditingController _nicknameController;
+  File? _selectedFile;
+  bool _isChanged = false;
+  bool _isUploading = false;
 
-    Future<File?> pickImageFromGallery() async {
-      final picker = ImagePicker();
-      final image = await picker.pickImage(source: ImageSource.gallery);
-      if (image == null) return null;
-      return File(image.path);
+  @override
+  void initState() {
+    super.initState();
+    _nicknameController = TextEditingController(text: widget.user.userNickname);
+    _nicknameController.addListener(() {
+      if (widget.user.userNickname != _nicknameController.text) {
+        setState(() => _isChanged = true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _nicknameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+    setState(() {
+      _selectedFile = File(image.path);
+      _isChanged = true;
+    });
+  }
+
+  Future<bool> _showExitDialog() async {
+    if (!_isChanged) return true; // 변경사항 없을 시 그냥 나가기
+
+    return (await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: const Text('변경사항이 저장되지 않아요'),
+            actions: [
+              TextButton(
+                onPressed: () => context.pop(false),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () => context.pop(true),
+                child: const Text('나가기'),
+              ),
+            ],
+          ),
+        )) ??
+        false;
+  }
+
+  Future<void> _saveProfile() async {
+    if (!_isChanged) {
+      context.pop();
+      return; // 변경사항 없을 시 그냥 나가기
     }
+    setState(() => _isUploading = true);
 
-    void _onAddButtonTap() async {
-      showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return SizedBox(
-            height: 150,
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.photo_library),
-                  title: const Text('갤러리에서 선택'),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    final file = await pickImageFromGallery();
-                    if (file != null) vm.selectFile(file);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.storage),
-                  title: const Text('기존 사진 선택'),
-                  onTap: () async {
-                    Navigator.pop(context);
-                    final urls = await vm.getProfileImages();
-                    if (urls.isNotEmpty) {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (_) => SizedBox(
-                          height: 300,
-                          child: ListView.builder(
-                            itemCount: urls.length,
-                            itemBuilder: (_, index) {
-                              return ListTile(
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(urls[index]),
-                                ),
-                                title: Text('사진 ${index + 1}'),
-                                onTap: () {
-                                  vm.selectUrl(urls[index]);
-                                  Navigator.pop(context);
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ],
-            ),
-          );
-        },
-      );
+    final vm = ref.read(userStateViewmodelProvider.notifier);
+    final newNickname = _nicknameController.text;
+
+    // String? newImageUrl;
+
+    final success = await vm.editProfile(
+      uid: widget.user.uid,
+      userNickname: newNickname,
+      imageFile: _selectedFile,
+    );
+
+    setState(() => _isUploading = false);
+
+    if (mounted) {
+      if (success) {
+        context.pop();
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('프로필 사진 저장에 실패했습니다.')));
+      }
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(userStateViewmodelProvider)!;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -94,7 +112,11 @@ class SettingPage extends ConsumerWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => context.go('/home'),
+          onPressed: () async {
+            if (await _showExitDialog()) {
+              context.go('/home');
+            }
+          },
         ),
         title: const Text(
           '프로필 수정',
@@ -113,12 +135,17 @@ class SettingPage extends ConsumerWidget {
             const SizedBox(height: 60),
             Stack(
               children: [
-                CircleAvatar(radius: 80, backgroundImage: imageProvider),
+                CircleAvatar(
+                  radius: 80,
+                  backgroundImage: _selectedFile != null
+                      ? FileImage(_selectedFile!) as ImageProvider
+                      : NetworkImage(state.profileImgUrl),
+                ),
                 Positioned(
                   bottom: 0,
                   right: 0,
                   child: GestureDetector(
-                    onTap: _onAddButtonTap,
+                    onTap: _pickImage,
                     child: Container(
                       width: 45,
                       height: 45,
@@ -134,36 +161,22 @@ class SettingPage extends ConsumerWidget {
                     ),
                   ),
                 ),
-                if (state.isUploading)
-                  const Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: SizedBox(
-                      width: 45,
-                      height: 45,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 3,
-                        ),
-                      ),
-                    ),
-                  ),
               ],
             ),
             const SizedBox(height: 40),
-            const Text(
-              '나는짱이다',
+            TextField(
+              controller: _nicknameController,
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 23,
                 color: Colors.black,
                 fontWeight: FontWeight.w500,
               ),
+              decoration: InputDecoration(border: InputBorder.none),
             ),
             const SizedBox(height: 40),
             ElevatedButton(
-              onPressed: state.isUploading ? null : () => vm.saveProfile(),
+              onPressed: _isUploading ? null : _saveProfile,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF613EEA),
                 minimumSize: const Size(double.infinity, 50),
@@ -171,7 +184,7 @@ class SettingPage extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: state.isUploading
+              child: _isUploading
                   ? const CircularProgressIndicator(
                       color: GoalMateTheme.white,
                       strokeWidth: 3.0,

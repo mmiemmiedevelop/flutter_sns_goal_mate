@@ -1,8 +1,10 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_princess/data/data_source/auth_data_source.dart';
 import 'package:flutter_princess/data/data_source/auth_data_source_impl.dart';
 import 'package:flutter_princess/data/data_source/user_data_source.dart';
 import 'package:flutter_princess/data/data_source/user_data_source_impl.dart';
 import 'package:flutter_princess/data/repository/auth_repository_impl.dart';
+import 'package:flutter_princess/data/repository/storage_repository_impl.dart';
 import 'package:flutter_princess/data/repository/user_repository_impl.dart';
 import 'package:flutter_princess/domain/repository/auth_repository.dart';
 import 'package:flutter_princess/domain/repository/user_repository.dart';
@@ -55,3 +57,10 @@ final googleLoginUsecaseProvider = Provider((ref) {
   final authRepository = ref.read(_authRepositoryProvider);
   return GoogleLoginUsecase(authRepository);
 });
+
+// setting 저장 provider 추가
+// Storage
+final storageProvider = Provider((ref) => FirebaseStorage.instance);
+final storageRepositoryProvider = Provider(
+  (ref) => StorageRepositoryImpl(ref.watch(storageProvider)),
+);
