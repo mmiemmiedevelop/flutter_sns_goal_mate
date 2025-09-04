@@ -26,6 +26,12 @@ class CommentRepositoryImpl implements CommentRepository {
         .toList();
   }
 
+  // 댓글 수 가져오기 구현
+  @override
+  Future<int> getCommentCount(String postId) async {
+    return await remoteDataSource.getCommentCount(postId);
+  }
+
   // 댓글 등록 구현
   @override
   Future<void> addComment(Comment comment) async {
@@ -60,5 +66,11 @@ class CommentRepositoryImpl implements CommentRepository {
   @override
   Future<void> deleteComment(String commentId) async {
     await remoteDataSource.deleteComment(commentId);
+  }
+
+  // 포스트의 댓글 수를 실제 댓글 수로 동기화
+  @override
+  Future<void> syncPostCommentCount(String postId) async {
+    await remoteDataSource.syncPostCommentCount(postId);
   }
 }

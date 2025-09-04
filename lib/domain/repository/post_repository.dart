@@ -4,12 +4,14 @@ import 'package:flutter_princess/domain/entity/post.dart';
 abstract class PostRepository {
   // 1. 게시글 리스트를 가져오거라. 성공하면 Post list, 실패하면 에러 던짐
   Future<List<Post>> fetchPosts();
-  // 2. 좋아요 상태를 변경하거라.
+  // 2. 특정 게시글을 ID로 가져오거라.
+  Future<Post?> getPostById(String postId);
+  // 3. 좋아요 상태를 변경하거라.
   Future<void> toggleLike(String postId, String usertId);
-  // 3. 게시글을 삭제하거라.
+  // 4. 게시글을 삭제하거라.
   Future<void> deletePost(String postId);
-  // 4. 게시글을 추가하거라.
+  // 5. 게시글을 추가하거라.
   Future<void> addPost(Post post);
-  // 5. 추가된 새 글을 보기 위해 무한스크롤 상태를 초기화하거라.
+  // 6. 추가된 새 글을 보기 위해 무한스크롤 상태를 초기화하거라.
   void reset();
 }

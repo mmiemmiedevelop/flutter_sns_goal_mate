@@ -3,6 +3,7 @@
 import 'package:flutter_princess/domain/entity/comment.dart';
 import 'package:flutter_princess/domain/usecase/fetch_comment_usecase.dart';
 import 'package:flutter_princess/presentation/pages/provider/comment_provider.dart';
+import 'package:flutter_princess/presentation/pages/home_page/home_page_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
@@ -66,14 +67,22 @@ class CommentPageViewModel extends FamilyAsyncNotifier<CommentState, String> {
     );
 
     try {
+      // Firebase에 댓글 추가 (동시에 포스트의 댓글 수도 증가)
       await _usecase.addComment(newComment);
+
+      // 로컬 상태 업데이트
+      final newComments = [newComment, ...stateNow.comments];
       state = AsyncData(
-        stateNow.copyWith(
-          comments: [newComment, ...stateNow.comments],
-          inputText: "",
-        ),
+        stateNow.copyWith(comments: newComments, inputText: ""),
       );
-    } catch (_) {}
+
+      // 홈페이지에서 Firebase로부터 최신 포스트 데이터를 가져와서 업데이트
+      await ref
+          .read(homePageViewModelProvider.notifier)
+          .refreshPostCommentCount(arg);
+    } catch (e) {
+      print("Error adding comment: $e");
+    }
   }
 
   void sentInputText(String value) {
@@ -105,12 +114,19 @@ class CommentPageViewModel extends FamilyAsyncNotifier<CommentState, String> {
     if (stateNow == null) return;
 
     try {
+      // Firebase에서 댓글 삭제 (동시에 포스트의 댓글 수도 감소)
       await _usecase.deleteComment(id);
-      state = AsyncData(
-        stateNow.copyWith(
-          comments: stateNow.comments.where((c) => c.id != id).toList(),
-        ),
-      );
-    } catch (_) {}
+
+      // 로컬 상태 업데이트
+      final newComments = stateNow.comments.where((c) => c.id != id).toList();
+      state = AsyncData(stateNow.copyWith(comments: newComments));
+
+      // 홈페이지에서 Firebase로부터 최신 포스트 데이터를 가져와서 업데이트
+      await ref
+          .read(homePageViewModelProvider.notifier)
+          .refreshPostCommentCount(arg);
+    } catch (e) {
+      print("Error deleting comment: $e");
+    }
   }
 }

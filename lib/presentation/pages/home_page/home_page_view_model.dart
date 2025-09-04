@@ -92,4 +92,41 @@ class HomePageViewModel extends StateNotifier<List<Post>> {
     state = [];
     await fetchNextPage();
   }
+
+  // 모든 포스트의 댓글 수를 Firebase와 동기화
+  Future<void> syncAllPostsCommentCount() async {
+    for (final post in state) {
+      try {
+        // Firebase에서 최신 포스트 데이터를 가져와서 댓글 수 업데이트
+        await refreshPostCommentCount(post.id);
+      } catch (e) {
+        print("Error syncing comment count for post ${post.id}: $e");
+      }
+    }
+  }
+
+  // Firebase에서 실시간으로 댓글 수 업데이트
+  Future<void> refreshPostCommentCount(String postId) async {
+    try {
+      // Firebase에서 해당 포스트의 최신 데이터를 가져옴
+      final updatedPosts = await _fetchPostsUseCase.getUpdatedPost(postId);
+      if (updatedPosts != null) {
+        // 해당 포스트만 업데이트
+        state = [
+          for (final post in state)
+            if (post.id == postId) updatedPosts else post,
+        ];
+      }
+    } catch (e) {
+      print("Error refreshing post comment count: $e");
+    }
+  }
+
+  // 댓글 수 업데이트 함수 (기존 방식도 유지)
+  void updateCommentCount(String postId, int newCount) {
+    state = [
+      for (final post in state)
+        if (post.id == postId) post.copyWith(commentCount: newCount) else post,
+    ];
+  }
 }

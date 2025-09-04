@@ -12,6 +12,11 @@ class FetchPostsUseCase {
     return _repository.fetchPosts();
   }
 
+  // 특정 포스트의 최신 데이터를 Firebase에서 가져오기
+  Future<Post?> getUpdatedPost(String postId) {
+    return _repository.getPostById(postId);
+  }
+
   // repositoy의 reset 여기서 호출
   void reset() {
     _repository.reset();

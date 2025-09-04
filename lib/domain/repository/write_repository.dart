@@ -19,6 +19,6 @@ class WriteRepository {
 
   // 게시글 업로드
   Future<void> addPost(Post post) async {
-    await _firestore.collection('posts').doc(post.id).set(post.toJson());
+    await _firestore.collection('post').doc(post.id).set(post.toJson());
   }
 }

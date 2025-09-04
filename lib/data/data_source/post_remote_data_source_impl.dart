@@ -27,6 +27,24 @@ class PostRemoteDataSourceImpl implements PostDataSource {
     return await query.get();
   }
 
+  // Firestore에서 특정 게시물 가져오기
+  @override
+  Future<DocumentSnapshot<Object?>> getPostById(String postId) async {
+    return await _postsCollection.doc(postId).get();
+  }
+
+  // 특정 포스트의 실제 댓글 수 계산
+  @override
+  Future<int> getActualCommentCount(String postId) async {
+    final snapshot = await _firestore
+        .collection('comments')
+        .where('postId', isEqualTo: postId)
+        .count()
+        .get();
+
+    return snapshot.count ?? 0;
+  }
+
   @override
   Future<void> toggleLike(String postId, String userId) async {
     // 여기서 Firestore Transaction을 사용하여 'likedBy'와 'likeCount'를 업데이트함
@@ -58,7 +76,7 @@ class PostRemoteDataSourceImpl implements PostDataSource {
 
   @override
   Future<void> deletePost(String postId) async {
-    // 여기에서는 'posts' 컬렉션에서 해당 문서를 삭제함
+    // 여기에서는 'post' 컬렉션에서 해당 문서를 삭제함
     return _postsCollection.doc(postId).delete();
   }
 

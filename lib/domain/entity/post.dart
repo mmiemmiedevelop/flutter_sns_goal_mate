@@ -122,7 +122,12 @@ class Post {
   }
 
   // 객체 일부필드만 변경하여 새로운 복사본 만들어주는 헬퍼 메서드
-  Post copyWith({String? id, int? likeCount, List<String>? likedBy}) {
+  Post copyWith({
+    String? id,
+    int? likeCount,
+    int? commentCount,
+    List<String>? likedBy,
+  }) {
     return Post(
       id: id ?? this.id,
       userId: userId,
@@ -133,7 +138,7 @@ class Post {
       content: content,
       createdAt: createdAt,
       likeCount: likeCount ?? this.likeCount,
-      commentCount: commentCount,
+      commentCount: commentCount ?? this.commentCount,
       likedBy: likedBy ?? this.likedBy,
     );
   }

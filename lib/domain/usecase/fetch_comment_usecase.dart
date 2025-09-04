@@ -9,6 +9,10 @@ class FetchCommentUsecase {
     return await repository.getComments(postId);
   }
 
+  Future<int> getCommentCount(String postId) async {
+    return await repository.getCommentCount(postId);
+  }
+
   Future<void> addComment(Comment comment) async {
     await repository.addComment(comment);
   }
@@ -19,5 +23,10 @@ class FetchCommentUsecase {
 
   Future<void> deleteComment(String commentId) async {
     await repository.deleteComment(commentId);
+  }
+
+  // 포스트의 댓글 수를 실제 댓글 수로 동기화
+  Future<void> syncPostCommentCount(String postId) async {
+    await repository.syncPostCommentCount(postId);
   }
 }
