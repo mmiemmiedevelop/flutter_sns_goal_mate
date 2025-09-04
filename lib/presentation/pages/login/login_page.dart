@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 /// 로그인 페이지
 class LoginPage extends ConsumerStatefulWidget {
@@ -67,13 +69,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
+  // Future<void> _google() async {
+  //   final gogo = await vm.googleLogin();
+  // }
+
   @override
   Widget build(BuildContext context) {
-    final pageController = PageController();
     //화면사이즈 설정용 MediaQuery
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    final height = size.height;
     return Stack(
       children: [
         Scaffold(
@@ -147,6 +151,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           GestureDetector(
                             onTap: () {
                               print('Google login');
+                              // _google();
                             },
                             child: Container(
                               width: double.infinity,
