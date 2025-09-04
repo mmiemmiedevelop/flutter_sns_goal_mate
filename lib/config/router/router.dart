@@ -10,6 +10,7 @@ import 'package:flutter_princess/presentation/pages/sign_up_page/sign_up_nick_na
 import 'package:flutter_princess/presentation/pages/sign_up_page/sign_up_page.dart';
 import 'package:flutter_princess/presentation/pages/splash/splash_screen.dart';
 import 'package:flutter_princess/presentation/pages/write_page/write_page.dart';
+import 'package:flutter_princess/presentation/pages/user_view_model/user_view_model.dart';
 import 'package:go_router/go_router.dart';
 
 final router = GoRouter(
@@ -60,10 +61,17 @@ final router = GoRouter(
       path: '/setting',
       name: 'setting',
       builder: (context, state) {
-        final user = state.extra as User?;
-        if (user == null) {
+        final userState = state.extra as UserState?;
+        if (userState == null) {
           return const Scaffold(body: Center(child: Text("오류: 사용자 정보가 없습니다.")));
         }
+        // UserState를 User로 변환해서 SettingPage에 전달
+        final user = User(
+          uid: userState.uid,
+          email: userState.email,
+          profileImgUrl: userState.profileImgUrl,
+          userNickname: userState.userNickname,
+        );
         return SettingPage(user: user);
       },
     ),

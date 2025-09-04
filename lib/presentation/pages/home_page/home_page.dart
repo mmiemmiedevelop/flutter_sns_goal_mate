@@ -13,13 +13,31 @@ import 'package:flutter_princess/presentation/pages/user_view_model/user_view_mo
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  late PageController pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final posts = ref.watch(homePageViewModelProvider);
-    final pageController = PageController();
 
     return Scaffold(
       // PageView.builder를 사용하여 틱톡처럼 위아래로 스크롤되는 피드를 만듬
@@ -27,7 +45,7 @@ class HomePage extends ConsumerWidget {
         onRefresh: () async {
           await ref.read(homePageViewModelProvider.notifier).refresh();
           // 리프레시가 완료되면 PageController를 첫 페이지(인덱스 0)로 이동
-          if (context.mounted) {
+          if (mounted && pageController.hasClients) {
             pageController.jumpToPage(0);
           }
         },
@@ -92,7 +110,8 @@ class _PostItemState extends ConsumerState<PostItem> {
     // print('userState.nickname: ${userState.userNickname}');
     final currentUserId = userState.uid;
 
-    final isMyPost = widget.post.userId == currentUserId;
+    // final isMyPost = widget.post.userId == currentUserId;
+    final isMyPost = true; // UI 테스트를 위해 항상 true로 고정
 
     // 좋아요 여부 서버에서 받아서 체크
     final bool isLiked = widget.post.likedBy.contains(currentUserId);
