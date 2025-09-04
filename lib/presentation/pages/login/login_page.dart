@@ -75,16 +75,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
 
     try {
-      await vm.googleLogin();
+      final ok = await vm.googleLogin();
       if (!mounted) return;
 
-      if (FirebaseAuth.instance.currentUser != null) {
+      if (ok) {
         context.pushNamed('home');
         print('Google 로그인 성공');
-      } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Google 로그인에 실패했습니다.')));
       }
     } catch (e) {
       if (!mounted) return;
