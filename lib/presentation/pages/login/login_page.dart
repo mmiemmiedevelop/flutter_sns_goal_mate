@@ -6,20 +6,18 @@ import 'package:go_router/go_router.dart';
 /// 로그인 페이지
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
-
   @override
   ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   UserViewModel get vm => ref.read(userStateViewmodelProvider.notifier);
+  bool _loading = false;
   //텍스트폼유효성검사
   final _formKey = GlobalKey<FormState>();
-
   //로그인폼텍스트컨트롤러 선언
   late final TextEditingController _email;
   late final TextEditingController _password;
-
   @override
   void initState() {
     super.initState();
@@ -53,13 +51,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (_formKey.currentState!.validate()) {
       final email = _email.text.trim();
       final password = _password.text;
-      // TODO: 로그인 처리
-      vm.login(email, password);
-      //debugPrint('login: $email / $password');
-      if (UserState != null) {
+      final ok = await vm.login(email, password);
+      if (!mounted) return;
+      if (ok) {
         context.pushNamed('home');
       } else {
-        print('UserState is null');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('아이디,비밀번호가 틀렸습니다.')));
       }
     }
   }
