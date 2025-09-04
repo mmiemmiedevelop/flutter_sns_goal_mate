@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_princess/main.dart';
 import 'package:flutter_princess/presentation/pages/user_view_model/user_view_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -28,6 +29,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     super.initState();
     _email = TextEditingController();
     _password = TextEditingController();
+    //analytics
+    analytics.logScreenView(screenName: 'login_page', screenClass: 'LoginPage');
   }
 
   @override
@@ -60,6 +63,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       final ok = await vm.login(email, password);
       if (!mounted) return;
       if (ok) {
+        //analytics
+        analytics.logEvent(
+          name: 'signin',
+          parameters: {'email': email, 'screen': 'login_page'},
+        );
         context.pushNamed('home');
       } else {
         ScaffoldMessenger.of(
@@ -79,6 +87,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       if (!mounted) return;
 
       if (ok) {
+        //analytics
+        analytics.logEvent(
+          name: 'Googlesignin',
+          parameters: {'screen': 'login_page'},
+        );
         context.pushNamed('home');
         print('Google 로그인 성공');
       }
