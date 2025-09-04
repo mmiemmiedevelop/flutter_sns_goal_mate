@@ -170,7 +170,7 @@ class _WritePageState extends ConsumerState<WritePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 60),
+            const SizedBox(height: 10),
             _buildImagePreview(),
             if (state.selectedImages.isNotEmpty)
               TextButton.icon(
@@ -178,7 +178,7 @@ class _WritePageState extends ConsumerState<WritePage> {
                 icon: Icon(Icons.add_a_photo),
                 label: Text("사진 추가"),
               ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 15),
             TextField(
               controller: _tagController,
               style: const TextStyle(color: Colors.black, fontSize: 17),
@@ -188,7 +188,7 @@ class _WritePageState extends ConsumerState<WritePage> {
                 hintStyle: TextStyle(color: Colors.grey[600]),
                 border: InputBorder.none,
                 isDense: true,
-                contentPadding: EdgeInsets.zero,
+                contentPadding: EdgeInsets.all(8),
               ),
             ),
             const SizedBox(height: 15),
@@ -206,7 +206,7 @@ class _WritePageState extends ConsumerState<WritePage> {
                 counterStyle: TextStyle(color: Colors.grey[600]),
                 border: InputBorder.none,
                 isDense: true,
-                contentPadding: EdgeInsets.zero,
+                contentPadding: EdgeInsets.all(8),
               ),
             ),
             const SizedBox(height: 20),
