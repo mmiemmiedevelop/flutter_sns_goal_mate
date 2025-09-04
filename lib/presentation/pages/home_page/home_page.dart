@@ -24,7 +24,13 @@ class HomePage extends ConsumerWidget {
     return Scaffold(
       // PageView.builder를 사용하여 틱톡처럼 위아래로 스크롤되는 피드를 만듬
       body: RefreshIndicator(
-        onRefresh: () => ref.read(homePageViewModelProvider.notifier).refresh(),
+        onRefresh: () async {
+          await ref.read(homePageViewModelProvider.notifier).refresh();
+          // 리프레시가 완료되면 PageController를 첫 페이지(인덱스 0)로 이동
+          if (context.mounted) {
+            pageController.jumpToPage(0);
+          }
+        },
         child: PageView.builder(
           controller: pageController,
           scrollDirection: Axis.vertical, // 스크롤 방향을 수직으로 설정
@@ -81,6 +87,9 @@ class _PostItemState extends ConsumerState<PostItem> {
     if (userState == null) {
       return const Center(child: CircularProgressIndicator());
     }
+    // print('userState.email: ${userState.email}');
+    // print('userState.uid: ${userState.uid}');
+    // print('userState.nickname: ${userState.userNickname}');
     final currentUserId = userState.uid;
 
     final isMyPost = widget.post.userId == currentUserId;

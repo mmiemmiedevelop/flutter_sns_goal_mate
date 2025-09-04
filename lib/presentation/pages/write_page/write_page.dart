@@ -118,7 +118,7 @@ class _WritePageState extends ConsumerState<WritePage> {
                 top: 8,
                 right: 8,
                 child: CircleAvatar(
-                  backgroundColor: Colors.black54,
+                  backgroundColor: Colors.white24,
                   child: IconButton(
                     icon: Icon(
                       Icons.close,
