@@ -8,12 +8,13 @@ import 'package:flutter_princess/presentation/pages/setting/setting_page.dart';
 import 'package:flutter_princess/presentation/pages/sign_up_page/sign_up_nick_name_page%20.dart';
 import 'package:flutter_princess/presentation/pages/sign_up_page/sign_up_page.dart';
 import 'package:flutter_princess/presentation/pages/splash/splash_screen.dart';
+import 'package:flutter_princess/presentation/pages/user_view_model.dart/user_view_model.dart';
 import 'package:flutter_princess/presentation/pages/write_page/write_page.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 final router = GoRouter(
   initialLocation: '/splash',
-
 
   routes: [
     GoRoute(
@@ -29,7 +30,7 @@ final router = GoRouter(
     GoRoute(
       path: '/signup',
       name: 'signup',
-      builder: (context, state) => SignUpPage(), // TODO: LoginPage UI 생성 후 연결
+      builder: (context, state) => SignUpPage(),
     ),
     GoRoute(
       path: '/signupnickname',
@@ -44,7 +45,7 @@ final router = GoRouter(
           password: password,
           imageFile: imageFile,
         );
-      }, // TODO: LoginPage UI 생성 후 연결
+      },
     ),
     GoRoute(
       path: '/home',
@@ -66,9 +67,11 @@ final router = GoRouter(
       name: 'comment',
       builder: (context, state) {
         final post = state.extra as Post?;
+
         if (post == null) {
           return const Scaffold(body: Center(child: Text("오류: 게시물 정보가 없습니다.")));
         }
+
         return CommentPage(postId: post.id, postUserId: post.userId);
       },
     ),

@@ -51,6 +51,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (_formKey.currentState!.validate()) {
       final email = _email.text.trim();
       final password = _password.text;
+<<<<<<< HEAD
+=======
+
+>>>>>>> dev
       final ok = await vm.login(email, password);
       if (!mounted) return;
       if (ok) {
@@ -79,6 +83,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               width: double.infinity,
               child: ListView(
                 padding: EdgeInsets.symmetric(horizontal: 26),
+<<<<<<< HEAD
+=======
+
+>>>>>>> dev
                 children: [
                   //logos 이미지
                   Column(
@@ -149,6 +157,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ),
                     ),
                   ),
+<<<<<<< HEAD
+=======
+
+>>>>>>> dev
                   //
                 ],
               ),

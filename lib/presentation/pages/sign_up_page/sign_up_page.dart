@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_princess/presentation/common_widget/button.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -86,11 +87,9 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    final pageController = PageController();
     //화면사이즈 설정용 MediaQuery
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    final height = size.height;
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -109,35 +108,7 @@ class _SignUpPageState extends State<SignUpPage> {
               SizedBox(height: 15),
 
               //프로필 이미지
-              Center(
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 100,
-                      backgroundColor: _imageFile == null
-                          ? const Color.fromARGB(255, 190, 190, 190)
-                          : null,
-                      backgroundImage: _imageFile != null
-                          ? FileImage(_imageFile!)
-                          : null,
-                    ),
-                    Positioned(
-                      right: 0,
-                      bottom: 0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color(0xFF613EEA),
-                        ),
-                        child: IconButton(
-                          onPressed: _pickImage,
-                          icon: Icon(Icons.add, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              ProfilePicker(imageFile: _imageFile, onTap: _pickImage),
               SizedBox(height: 50),
               //로그인폼
               Container(
@@ -181,16 +152,8 @@ class _SignUpPageState extends State<SignUpPage> {
                       SizedBox(height: 50),
                       Container(
                         width: double.infinity,
-                        height: 50,
                         child: ElevatedButton(
                           onPressed: _submit,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF613EEA),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
                           child: const Text('회원가입'),
                         ),
                       ),
