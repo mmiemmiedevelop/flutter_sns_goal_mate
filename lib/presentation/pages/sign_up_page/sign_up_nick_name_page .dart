@@ -67,28 +67,26 @@ class _SignUpNickNamePageState extends ConsumerState<SignUpNickNamePage> {
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
       final userNickName = _userNickName.text.trim();
-      if (_imageFile == null) {}
-      // TODO:회원가입 처리
-      debugPrint('userNickName: $userNickName');
+      if (_imageFile == null) {
+        //스토리지에 업로드
+        final ref = FirebaseStorage.instance.ref(
+          'users/$userNickName/profile.jpg',
+        );
+        final imgbyte = await _imageFile!.readAsBytes();
+        final putData = await ref.putData(imgbyte);
 
-      //스토리지에 업로드
-      final ref = FirebaseStorage.instance.ref(
-        'users/$userNickName/profile.jpg',
-      );
-      final imgbyte = await _imageFile!.readAsBytes();
-      final putData = await ref.putData(imgbyte);
+        //Url받고
 
-      //Url받고
+        final String imgUrl = await putData.ref.getDownloadURL(); //타입확인
+        //auth 회원가입처리 -> uid나옴 -> firestore User에 저장
 
-      final String imgUrl = await putData.ref.getDownloadURL(); //타입확인
-      //auth 회원가입처리 -> uid나옴 -> firestore User에 저장
-
-      vm.signUp(
-        email: email,
-        password: password,
-        imgUrl: imgUrl,
-        userNickname: userNickName,
-      );
+        vm.signUp(
+          email: email,
+          password: password,
+          imgUrl: imgUrl,
+          userNickname: userNickName,
+        );
+      }
     }
     context.pushNamed('home');
   }
