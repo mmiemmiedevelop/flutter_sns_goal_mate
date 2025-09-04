@@ -86,15 +86,9 @@ class MockPostDataSource extends _i1.Mock implements _i3.PostDataSource {
           as _i4.Future<void>);
 
   @override
-  _i4.Future<void> addPost(
-    String? uid,
-    List<dynamic>? tag,
-    String? content,
-    List<dynamic>? imgurl,
-    DateTime? createdAt,
-  ) =>
+  _i4.Future<void> addPost(String? postId, Map<String, dynamic>? data) =>
       (super.noSuchMethod(
-            Invocation.method(#addPost, [uid, tag, content, imgurl, createdAt]),
+            Invocation.method(#addPost, [postId, data]),
             returnValue: _i4.Future<void>.value(),
             returnValueForMissingStub: _i4.Future<void>.value(),
           )
