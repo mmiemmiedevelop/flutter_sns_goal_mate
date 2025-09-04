@@ -205,7 +205,7 @@ class _PostItemState extends ConsumerState<PostItem> {
             child: Material(
               color: GoalMateTheme.signatureColor,
               child: InkWell(
-                onTap: () => context.go('/write'),
+                onTap: () => context.push('/write'),
                 child: Container(
                   padding: const EdgeInsets.all(4.0),
                   decoration: BoxDecoration(
