@@ -48,16 +48,6 @@ class UserViewModel extends Notifier<UserState?> {
       final user = await usecase.execute(email, password, '', userNickname);
       if (user == null) return false;
 
-      //이미지 -> url변환 전처리
-      // final ref = FirebaseStorage.instance.ref('users/${user.uid}/profile.jpg');
-      // final imgbyte = await imgUrl!.readAsBytes();
-      // final putData = await ref.putData(imgbyte);
-      // final String profileImgUrl = await putData.ref.getDownloadURL();
-      // final profileImgUrl = await getImgUrl(
-      //   imageFile: imgUrl,
-      //   path: '${user.uid}/profile.jpg',
-      // );
-
       await editProfile(
         uid: user.uid,
         userNickname: userNickname,
