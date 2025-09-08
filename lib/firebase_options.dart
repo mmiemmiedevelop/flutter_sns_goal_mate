@@ -63,9 +63,10 @@ class DefaultFirebaseOptions {
     messagingSenderId: '206708911603',
     projectId: 'flutter-snsloca',
     storageBucket: 'flutter-snsloca.firebasestorage.app',
-    androidClientId: '206708911603-vtljdc115rrfetv8cdp7o7i65vc461cn.apps.googleusercontent.com',
-    iosClientId: '206708911603-impl629unguvs45gqs54a3ftl64c6vvh.apps.googleusercontent.com',
-    iosBundleId: 'com.example.flutterPrincess',
+    androidClientId:
+        '206708911603-vtljdc115rrfetv8cdp7o7i65vc461cn.apps.googleusercontent.com',
+    iosClientId:
+        '206708911603-impl629unguvs45gqs54a3ftl64c6vvh.apps.googleusercontent.com',
+    iosBundleId: 'com.princess.flutterPrincess',
   );
-
 }

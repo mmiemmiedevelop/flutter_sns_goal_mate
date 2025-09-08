@@ -7,11 +7,9 @@ import 'package:flutter_princess/domain/entity/post.dart';
 import 'package:flutter_princess/domain/entity/post.dart';
 
 class WritePageState {
-  // final File? selectedImage;
   final List<File> selectedImages;
   final bool isUploading;
 
-  // WritePageState({this.selectedImage, this.isUploading = false});
   WritePageState({this.selectedImages = const [], this.isUploading = false});
 
   WritePageState copyWith({List<File>? selectedImages, bool? isUploading}) {
@@ -34,7 +32,7 @@ class WritePageViewModel extends StateNotifier<WritePageState> {
   ) : super(WritePageState());
 
   // 이미지 선택
-  // void selectImage(File image) {
+
   void selectImages(List<File> images) {
     state = state.copyWith(
       selectedImages: [...state.selectedImages, ...images],
@@ -56,17 +54,13 @@ class WritePageViewModel extends StateNotifier<WritePageState> {
   // 이미지 업로드
   Future<List<String>> uploadImages(List<File> images) async {
     List<String> imageUrls = [];
-    //여기다가 제가 준 코드
-    // final imageUrls = await uploadImages(imageFiles: images, path: 'posts'); 하면 List<String> 반환됌
-    //ㄴ 오키~
 
-    return await _uploadImagesUseCase.execute(images, 'posts');
+    return await _uploadImagesUseCase.execute(images, 'post');
   }
 
   // 게시글 업로드
   Future<void> addPost(Post post) async {
     await _addPostUseCase.execute(post);
-    // TODO : 확인해야함
-    // _homePageViewModel.refresh();
+    _homePageViewModel.refresh();
   }
 }

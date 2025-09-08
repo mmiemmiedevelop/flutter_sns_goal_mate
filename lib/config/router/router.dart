@@ -11,6 +11,7 @@ import 'package:flutter_princess/presentation/pages/sign_up_page/sign_up_page.da
 import 'package:flutter_princess/presentation/pages/splash/splash_screen.dart';
 import 'package:flutter_princess/presentation/pages/write_page/write_page.dart';
 import 'package:flutter_princess/presentation/pages/user_view_model/user_view_model.dart';
+import 'package:flutter_princess/presentation/policy/signup_agreement.dart';
 import 'package:go_router/go_router.dart';
 
 final router = GoRouter(
@@ -21,6 +22,20 @@ final router = GoRouter(
       path: '/splash',
       name: 'splash',
       builder: (context, state) => SplashScreen(),
+    ),
+    GoRoute(
+      path: '/policy', // 결과 반환용(구글로그인에서 사용)
+      name: 'policy',
+      builder: (context, state) => SignupAgreement(
+        onAgreed: () => Navigator.pop(context, true), // bool 반환
+      ),
+    ),
+    GoRoute(
+      path: '/policyToSignup', // 회원가입 버튼에서 사용
+      name: 'policyToSignup',
+      builder: (context, state) => SignupAgreement(
+        onAgreed: () => context.go('/signup'), // 동의 후 회원가입 화면으로
+      ),
     ),
     GoRoute(
       path: '/login',

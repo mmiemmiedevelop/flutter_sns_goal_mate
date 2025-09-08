@@ -83,7 +83,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
 
     try {
-      final ok = await vm.googleLogin();
+      final ok = await vm.googleLogin(context);
       if (!mounted) return;
 
       if (ok) {
@@ -228,7 +228,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           SizedBox(height: 15),
                           TextButton(
                             onPressed: () {
-                              context.pushNamed('signup');
+                              context.pushNamed('policyToSignup');
                             },
                             child: Text('회원가입'),
                           ),

@@ -1,4 +1,5 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_princess/config/router/router.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,9 +18,10 @@ void main() async {
     (options) {
       options.dsn =
           'https://42581d6f0bfbf152113239f124e5b691@o4509936148348928.ingest.us.sentry.io/4509961160491008';
+      options.environment = kReleaseMode ? 'production' : 'development';
+      options.tracesSampleRate = kReleaseMode ? 0.1 : 1.0;
+      options.profilesSampleRate = kReleaseMode ? 0.05 : 1.0;
       options.sendDefaultPii = true;
-      options.tracesSampleRate = 1.0;
-      options.profilesSampleRate = 1.0;
     },
     appRunner: () =>
         runApp(SentryWidget(child: const ProviderScope(child: MyApp()))),

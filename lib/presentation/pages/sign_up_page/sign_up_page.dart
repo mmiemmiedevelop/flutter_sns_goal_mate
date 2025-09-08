@@ -82,7 +82,6 @@ class _SignUpPageState extends State<SignUpPage> {
           'imageFile': _imageFile, // File?
         },
       );
-      // debugPrint('singuppage: $email / $password/$_imageFile');
     }
   }
 

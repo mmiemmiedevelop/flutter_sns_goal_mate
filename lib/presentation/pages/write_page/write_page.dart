@@ -6,7 +6,6 @@ import 'package:flutter_princess/presentation/pages/user_view_model/user_view_mo
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'write_page_view_model.dart';
 import '../../../domain/entity/post.dart';
 
 class WritePage extends ConsumerStatefulWidget {
