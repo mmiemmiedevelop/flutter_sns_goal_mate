@@ -323,3 +323,7 @@ fabric.properties
 #pubspec.lock
 pubspec.lock
 sentry.properties
+
+key.properties
+**/*.keystore
+**/*.jks

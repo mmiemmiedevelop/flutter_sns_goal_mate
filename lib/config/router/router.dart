@@ -11,6 +11,7 @@ import 'package:flutter_princess/presentation/pages/sign_up_page/sign_up_page.da
 import 'package:flutter_princess/presentation/pages/splash/splash_screen.dart';
 import 'package:flutter_princess/presentation/pages/write_page/write_page.dart';
 import 'package:flutter_princess/presentation/pages/user_view_model/user_view_model.dart';
+import 'package:flutter_princess/presentation/policy/signup_agreement.dart';
 import 'package:go_router/go_router.dart';
 
 final router = GoRouter(
@@ -21,6 +22,15 @@ final router = GoRouter(
       path: '/splash',
       name: 'splash',
       builder: (context, state) => SplashScreen(),
+    ),
+    GoRoute(
+      path: '/policy',
+      name: 'policy',
+      builder: (context, state) => SignupAgreement(
+        onAgreed: () {
+          return context.go('/signup');
+        },
+      ),
     ),
     GoRoute(
       path: '/login',

@@ -228,7 +228,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           SizedBox(height: 15),
                           TextButton(
                             onPressed: () {
-                              context.pushNamed('signup');
+                              context.pushNamed('policy');
                             },
                             child: Text('회원가입'),
                           ),
