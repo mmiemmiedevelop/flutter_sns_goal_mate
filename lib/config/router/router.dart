@@ -24,12 +24,17 @@ final router = GoRouter(
       builder: (context, state) => SplashScreen(),
     ),
     GoRoute(
-      path: '/policy',
+      path: '/policy', // 결과 반환용(구글로그인에서 사용)
       name: 'policy',
       builder: (context, state) => SignupAgreement(
-        onAgreed: () {
-          return context.go('/signup');
-        },
+        onAgreed: () => Navigator.pop(context, true), // bool 반환
+      ),
+    ),
+    GoRoute(
+      path: '/policyToSignup', // 회원가입 버튼에서 사용
+      name: 'policyToSignup',
+      builder: (context, state) => SignupAgreement(
+        onAgreed: () => context.go('/signup'), // 동의 후 회원가입 화면으로
       ),
     ),
     GoRoute(

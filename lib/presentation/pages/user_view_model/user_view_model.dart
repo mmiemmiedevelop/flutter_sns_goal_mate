@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_princess/presentation/common_widget/util/get_img_url.dart';
 import 'package:flutter_princess/presentation/pages/provider/user_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 //로그인한 user uid 가져오는법
 // final fecthuser = ref.read(fetchUserusecaseProvider);
@@ -134,13 +135,36 @@ class UserViewModel extends Notifier<UserState?> {
   }
 
   //구글로그인 (클린 아키텍처 적용)
-  Future<bool> googleLogin() async {
+  Future<bool> googleLogin(BuildContext context) async {
     final usecase = ref.read(googleLoginUsecaseProvider);
 
     try {
+      // 1) 구글 로그인
       final user = await usecase.execute();
       if (user == null) return false;
 
+      final uid = user.uid;
+
+      // 2) 동의 이력 확인
+      final users = FirebaseFirestore.instance.collection('user');
+      final snap = await users.doc(uid).get();
+      final hasAgreement = snap.exists && (snap.data()?['agreedAt'] != null);
+
+      // 3) 약관 동의 요구
+      if (!hasAgreement) {
+        final agreed =
+            await GoRouter.of(context).push<bool>('/policy') ?? false;
+        if (agreed != true) {
+          await FirebaseAuth.instance.signOut();
+          return false;
+        }
+        await users.doc(uid).set({
+          'uid': uid,
+          'agreedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+      }
+
+      // 4) 상태 갱신
       state = UserState(
         uid: user.uid,
         email: user.email,
@@ -149,7 +173,7 @@ class UserViewModel extends Notifier<UserState?> {
       );
       return true;
     } catch (e) {
-      print('구글 로그인 실패: $e');
+      debugPrint('구글 로그인 실패: $e');
       return false;
     }
   }

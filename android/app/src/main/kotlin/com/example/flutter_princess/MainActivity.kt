@@ -1,4 +1,4 @@
-package com.example.flutter_princess
+package com.princess.flutter_princess
 
 import io.flutter.embedding.android.FlutterActivity
 

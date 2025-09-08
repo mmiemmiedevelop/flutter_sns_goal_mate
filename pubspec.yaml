@@ -54,6 +54,12 @@ dependencies:
   uuid: ^4.5.1
   google_sign_in: ^7.1.1
   webview_flutter: ^4.13.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon.png"
   
 dev_dependencies:
   sentry_dart_plugin: ^3.1.1
